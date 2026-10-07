@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: brightfunded-mission-control
+    runtime: node
+    plan: free
+    rootDir: app
+    buildCommand: npm ci --include=dev && npm run build
+    # Create/sync the MySQL tables, then start the server
+    startCommand: npx drizzle-kit push --force && npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false # paste the Aiven Service URI in the Render dashboard
+      - key: APP_ID
+        value: brightfunded
+      - key: APP_SECRET
+        generateValue: true
