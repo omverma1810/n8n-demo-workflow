@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: signalforge-mission-control
+    name: signalforge-mission-control-demo
     runtime: node
     plan: free
     rootDir: app

@@ -42,8 +42,8 @@ Then open http://localhost:5678
 1. In n8n: **⋯ (top right) → Import from File** → select `SignalForge_AI_Growth_Ops_Engine_n8n.json`
 2. Open the **⚙️ CONFIG** node (there are 4 copies — one per pipeline — fill in all four with the same values):
    - `brandName` → the client/firm the content is written for (e.g. `Northbridge Capital`)
-   - `targetUrl` → a public site to scrape + monitor (e.g. `https://www.fxstreet.com/`)
-   - `trustpilotDomain` → domain used for the Trustpilot rating lookup (e.g. `fxstreet.com`)
+   - `targetUrl` → a public site to scrape + monitor (e.g. `https://www.ftmo.com/`)
+   - `trustpilotDomain` → domain used for the Trustpilot rating lookup (e.g. `ftmo.com`)
    - `geminiApiKey` → your key from Step 1
    - `googleSheetId` → from Step 4
    - `telegramChatId` → from Step 5

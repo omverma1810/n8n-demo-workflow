@@ -162,13 +162,13 @@
               "id": "cfg-CONFIG-1",
               "name": "targetUrl",
               "type": "string",
-              "value": "https://www.fxstreet.com/"
+              "value": "https://ftmo.com/"
             },
             {
               "id": "cfg-CONFIG-2",
               "name": "trustpilotDomain",
               "type": "string",
-              "value": "fxstreet.com"
+              "value": "ftmo.com"
             }
           ]
         },
@@ -890,13 +890,13 @@
               "id": "cfg-FIGLeads-1",
               "name": "targetUrl",
               "type": "string",
-              "value": "https://www.fxstreet.com/"
+              "value": "https://ftmo.com/"
             },
             {
               "id": "cfg-FIGLeads-2",
               "name": "trustpilotDomain",
               "type": "string",
-              "value": "fxstreet.com"
+              "value": "ftmo.com"
             }
           ]
         },
@@ -983,13 +983,13 @@
               "id": "cfg-GMonitor-1",
               "name": "targetUrl",
               "type": "string",
-              "value": "https://www.fxstreet.com/"
+              "value": "https://ftmo.com/"
             },
             {
               "id": "cfg-GMonitor-2",
               "name": "trustpilotDomain",
               "type": "string",
-              "value": "fxstreet.com"
+              "value": "ftmo.com"
             }
           ]
         },
@@ -1030,7 +1030,7 @@
     },
     {
       "parameters": {
-        "url": "=https://www.trustpilot.com/review/{{ $('⚙️ CONFIG (Monitor)').first().json.trustpilotDomain }}",
+        "url": "=https://r.jina.ai/https://www.trustpilot.com/review/{{ $('⚙️ CONFIG (Monitor)').first().json.trustpilotDomain }}",
         "options": {
           "timeout": 15000,
           "response": {
@@ -1064,7 +1064,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Input 0 (merged): site check result or error; Trustpilot HTML referenced directly\nlet statusCode = 0, siteOk = false;\nconst siteItem = $input.all()[0].json;\nif (siteItem.error) { statusCode = 0; siteOk = false; }\nelse { siteOk = true; statusCode = 200; }\n\nlet rating = null;\ntry {\n  const tp = ($('⭐ Scrape Trustpilot Rating').first().json.data || '').toString();\n  const m = tp.match(/ratingValue[^0-9]*([0-9.]+)/i) || tp.match(/([0-9]\\.[0-9])\\s*out of 5/i);\n  if (m) rating = parseFloat(m[1]);\n} catch (e) {}\n\nreturn [{ json: {\n  checked_at: new Date().toISOString(),\n  url: $('⚙️ CONFIG (Monitor)').first().json.targetUrl,\n  site_up: siteOk,\n  status_code: statusCode,\n  trustpilot_rating: rating\n} }];"
+        "jsCode": "// Input 0: site check result or error. Trustpilot text is read from its own node.\nlet statusCode = 0, siteOk = false;\nconst siteItem = $input.all()[0].json;\nif (siteItem.error) { statusCode = 0; siteOk = false; }\nelse { siteOk = true; statusCode = 200; }\n\nlet rating = null;\ntry {\n  const tp = ($('⭐ Scrape Trustpilot Rating').first().json.data || '').toString();\n  const head = tp.slice(0, 300);\n  const i = head.indexOf(' with ');\n  if (i >= 0) {\n    const m = head.slice(i, i + 20).match(/[0-9][.][0-9]|[0-9]/);\n    if (m) rating = parseFloat(m[0]);\n  }\n} catch (e) {}\n\nreturn [{ json: {\n  checked_at: new Date().toISOString(),\n  url: $('⚙️ CONFIG (Monitor)').first().json.targetUrl,\n  site_up: siteOk,\n  status_code: statusCode,\n  trustpilot_rating: rating\n} }];"
       },
       "id": "0f401f0e-cc59-42ee-807c-b15b66272aef",
       "name": "🧮 Compute Health",
@@ -1344,13 +1344,13 @@
               "id": "cfg-IGErrors-1",
               "name": "targetUrl",
               "type": "string",
-              "value": "https://www.fxstreet.com/"
+              "value": "https://ftmo.com/"
             },
             {
               "id": "cfg-IGErrors-2",
               "name": "trustpilotDomain",
               "type": "string",
-              "value": "fxstreet.com"
+              "value": "ftmo.com"
             }
           ]
         },
@@ -1735,11 +1735,6 @@
       "main": [
         [
           {
-            "node": "🌐 Check target site",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "⭐ Scrape Trustpilot Rating",
             "type": "main",
             "index": 0
@@ -1842,6 +1837,17 @@
           },
           {
             "node": "📧 Gmail: Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⭐ Scrape Trustpilot Rating": {
+      "main": [
+        [
+          {
+            "node": "🌐 Check target site",
             "type": "main",
             "index": 0
           }
