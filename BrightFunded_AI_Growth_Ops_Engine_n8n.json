@@ -1,0 +1,1673 @@
+{
+  "name": "☀️ BrightFunded — AI Growth Ops Engine",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## ☀️ BrightFunded — AI Growth Ops Engine\n\n**4 autonomous pipelines, 100% free stack** (Gemini API free tier + Google Sheets + Gmail + Telegram).\n\n### Before you run:\n1. Open the **⚙️ CONFIG** node and fill in: `geminiApiKey`, `googleSheetId`, `telegramChatId`, `teamEmail`, `dashboardWebhookUrl`\n2. Attach your own credentials to the Google Sheets / Gmail / Telegram nodes\n3. Activate the workflow 🚀\n\nPipelines:\n- **A. Market Intel & Content Engine** (daily 08:00)\n- **B. Lead Intake & AI Scoring** (webhook)\n- **C. Site & Reputation Monitor** (hourly)\n- **D. Global Error Handler** (set this workflow as its own error workflow in Settings)",
+        "width": 460,
+        "height": 420,
+        "color": 5
+      },
+      "id": "45e878a9-9334-4562-9839-c59b417723e0",
+      "name": "📌 README",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🅰️ Daily Market Intel & Content Engine\n\nEvery morning at 08:00:\n1. Pulls **3 trading RSS feeds** (FXStreet, ForexLive, CoinDesk)\n2. Scrapes **brightfunded.com** for live promo context\n3. **Gemini** writes a market brief, sentiment score, content angles, and ready-to-post social copy (X / LinkedIn / Discord)\n4. Gemini drafts a **blog post outline**\n5. Logs everything to **Google Sheets**, emails the brief to the team, pings **Telegram**, and pushes it to the **Mission Control dashboard**",
+        "width": 460,
+        "height": 320,
+        "color": 4
+      },
+      "id": "f1fc9c20-c121-4198-8d10-bff933b29f79",
+      "name": "📌 Pipeline A",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -420
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🅱️ Lead Intake & AI Scoring\n\n`POST /webhook/brightfunded-lead` with JSON `{ name, email, country, experience, capital, message }`\n\n1. Validates the payload\n2. **Gemini scores the lead 1–10**, classifies the trader persona, recommends a challenge size and drafts a personalized reply\n3. Logs to the **Leads** sheet + dashboard\n4. **Hot leads (≥7)** → instant Telegram alert + priority email\n5. Everyone else → nurture email\n6. Responds to the caller with the full scoring JSON",
+        "width": 460,
+        "height": 320,
+        "color": 6
+      },
+      "id": "b2c31cef-c037-41b8-b5a3-0ad4813ae3c2",
+      "name": "📌 Pipeline B",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        140
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🅲 Site & Reputation Monitor\n\nEvery hour:\n1. Checks **brightfunded.com** availability + status code\n2. Scrapes the Trustpilot rating\n3. Logs uptime to Sheets + dashboard\n4. **Downtime or rating drop → instant Telegram alert**\n\nNever get caught off-guard during a promo again.",
+        "width": 460,
+        "height": 260,
+        "color": 3
+      },
+      "id": "6ac516c3-af3c-427c-bf86-347a43dcb622",
+      "name": "📌 Pipeline C",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 🅳 Global Error Handler\n\nCatches **any** failure in the other pipelines.\n\n→ Telegram + email alert with the failed node, message and execution URL.\n\n*Workflow Settings → Error Workflow → select this workflow itself.*",
+        "width": 460,
+        "height": 220,
+        "color": 7
+      },
+      "id": "551a9145-faa5-42df-ae0e-9c607d8cc5ae",
+      "name": "📌 Pipeline D",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        1080
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "3d8e6fbf-69bf-49ba-9a06-1932be40aaf2",
+      "name": "▶️ Manual: Run Demo Now",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 * * *"
+            }
+          ]
+        }
+      },
+      "id": "d3358918-bf06-48aa-964e-d644f780fcef",
+      "name": "⏰ Schedule: Daily 08:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -420,
+        60
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "627e99e1-5b49-441b-b102-36a80dc6cab2",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "efdef275-1f0c-40fe-a8f7-0eb0648f46ac",
+              "name": "googleSheetId",
+              "type": "string",
+              "value": "PASTE_YOUR_GOOGLE_SHEET_ID"
+            },
+            {
+              "id": "f5e3a12f-e0b6-49a8-995d-1b13469bbc76",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "619ea272-f850-4570-9bfc-f39a742cac11",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "26094d75-b7e5-46cd-ba69-7286303f792a",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "91c0cf4c-0df8-4ddc-b9f1-fa483ad844b2",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5cae678c-9e4b-4d9f-950b-162d9bdb9dd8",
+      "name": "⚙️ CONFIG",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        -20
+      ],
+      "notes": "👈 Fill in these 5 values once. Get a FREE Gemini key at https://aistudio.google.com/apikey"
+    },
+    {
+      "parameters": {
+        "url": "https://www.fxstreet.com/rss/news",
+        "options": {}
+      },
+      "id": "ba2165c3-c20e-436e-be42-c018cb129e94",
+      "name": "RSS: FXStreet",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        -240
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.forexlive.com/feed/",
+        "options": {}
+      },
+      "id": "3a7c5a14-7471-47a4-bb6a-6b4928b89915",
+      "name": "RSS: ForexLive",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.coindesk.com/arc/outboundfeeds/rss/",
+        "options": {}
+      },
+      "id": "7327bc34-e307-45be-9daa-eea2ce406ae9",
+      "name": "RSS: CoinDesk",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        -40
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://brightfunded.com/",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "88556122-43e0-4a7d-9504-005f1b66f792",
+      "name": "🌐 Scrape brightfunded.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        100
+      ],
+      "settings": {
+        "onError": "continueRegularOutput"
+      }
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 3
+      },
+      "id": "dc02aa89-41cf-4167-a7da-04cafe93fd37",
+      "name": "Merge Feeds",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        300,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Gather RSS headlines + BrightFunded site context, build the Gemini prompt\nconst feedItems = $input.all()\n  .filter(i => i.json && i.json.title)\n  .slice(0, 18)\n  .map(i => ({ title: i.json.title, source: (i.json.link || '').split('/')[2] || 'rss', published: i.json.pubDate || i.json.isoDate || '' }));\n\nlet siteTitle = '';\nlet siteSnippet = '';\ntry {\n  const html = ($('🌐 Scrape brightfunded.com').first().json.data || '').toString();\n  const t = html.match(/<title[^>]*>([^<]+)<\\/title>/i);\n  siteTitle = t ? t[1].trim() : '';\n  const txt = html.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  siteSnippet = txt.slice(0, 1200);\n} catch (e) { /* site scrape optional */ }\n\nconst today = new Date().toISOString().slice(0, 10);\n\nconst prompt = `You are the growth-operations AI for BrightFunded, a modern proprietary trading firm (funded trader challenges from $5K to $200K, up to 100% profit split, 24-hour guaranteed payouts, platforms MT5/cTrader/DXtrade, 40,000+ traders in 155+ countries).\n\nTODAY: ${today}\n\nBRIGHTFUNDED HOMEPAGE SNAPSHOT:\nTitle: ${siteTitle}\nContent snippet: ${siteSnippet}\n\nLATEST MARKET HEADLINES (RSS):\n${feedItems.map((h, i) => `${i + 1}. [${h.source}] ${h.title}`).join('\\n')}\n\nTASK — return STRICT JSON only (no markdown, no backticks) with exactly these keys:\n{\n  \"market_summary\": \"3-4 sentence digest of what moved markets and why it matters to retail prop traders\",\n  \"sentiment\": \"risk-on | risk-off | mixed\",\n  \"sentiment_reason\": \"one sentence\",\n  \"content_angles\": [\"angle 1\", \"angle 2\", \"angle 3\"],\n  \"social_posts\": {\n    \"x\": \"max 260 chars, punchy, include hashtags #BrightFunded #PropTrading\",\n    \"linkedin\": \"120-180 words, professional tone\",\n    \"discord\": \"community style, emojis allowed, 2-4 lines\"\n  },\n  \"blog_idea\": \"one blog title for brightfunded.com/blog tied to today's markets\",\n  \"seo_keywords\": [\"kw1\", \"kw2\", \"kw3\", \"kw4\", \"kw5\"]\n}`;\n\nreturn [{ json: { date: today, headlines: feedItems, siteTitle, prompt } }];"
+      },
+      "id": "ad3567cf-c839-4e7f-92a9-9429098f5e17",
+      "name": "🧮 Aggregate & Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG').first().json.geminiApiKey }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 2048, responseMimeType: \"application/json\" } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "40bff67d-b9a7-4510-9336-f75d01df4fb8",
+      "name": "🤖 Gemini: Daily Brief",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        -140
+      ],
+      "notes": "Free tier: 1,500 requests/day on gemini-2.5-flash"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Parse Gemini JSON response robustly\nlet raw = '';\ntry { raw = $json.candidates[0].content.parts[0].text || ''; } catch (e) { raw = ''; }\nraw = raw.replace(/```json|```/g, '').trim();\nlet brief = {};\ntry { brief = JSON.parse(raw); } catch (e) {\n  const m = raw.match(/\\{[\\s\\S]*\\}/);\n  if (m) { try { brief = JSON.parse(m[0]); } catch (e2) { brief = {}; } }\n}\nconst date = $('🧮 Aggregate & Build Prompt').first().json.date;\nreturn [{ json: {\n  date,\n  market_summary: brief.market_summary || '(no summary generated)',\n  sentiment: brief.sentiment || 'mixed',\n  sentiment_reason: brief.sentiment_reason || '',\n  content_angles: Array.isArray(brief.content_angles) ? brief.content_angles : [],\n  post_x: (brief.social_posts && brief.social_posts.x) || '',\n  post_linkedin: (brief.social_posts && brief.social_posts.linkedin) || '',\n  post_discord: (brief.social_posts && brief.social_posts.discord) || '',\n  blog_idea: brief.blog_idea || '',\n  seo_keywords: Array.isArray(brief.seo_keywords) ? brief.seo_keywords : [],\n  headline_count: ($('🧮 Aggregate & Build Prompt').first().json.headlines || []).length\n} }];"
+      },
+      "id": "2a68c1f3-82c0-43bb-97e5-1b82e8d1ca8d",
+      "name": "🧩 Parse Brief JSON",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1020,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('⚙️ CONFIG').first().json.googleSheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Daily Briefs",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "6abf21f9-9a4b-4204-a766-8f65c882fe52",
+      "name": "📊 Sheet: Log Daily Brief",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1260,
+        -300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account (connect yours)"
+        }
+      },
+      "notes": "Create a Google Sheet with a tab named 'Daily Briefs' (headers auto-map: date, market_summary, sentiment, post_x, post_linkedin, post_discord, blog_idea)"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG').first().json.geminiApiKey }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are BrightFunded's content strategist. Write a detailed blog post outline (markdown: H2/H3 sections, 3 bullet points each, suggested CTA to start a challenge) for this title: \" + $json.blog_idea + \"\\nTarget keywords: \" + $json.seo_keywords.join(\", \") + \"\\nAudience: retail forex/crypto traders considering prop firm challenges. Mention BrightFunded benefits naturally: 24h guaranteed payouts, up to 100% profit split, no time limits.\" }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "962d3286-6b6b-404c-ba47-c64fec64370d",
+      "name": "🤖 Gemini: Blog Outline",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        -140
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('⚙️ CONFIG').first().json.googleSheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Calendar",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "date": "={{ $('🧩 Parse Brief JSON').first().json.date }}",
+            "blog_title": "={{ $('🧩 Parse Brief JSON').first().json.blog_idea }}",
+            "seo_keywords": "={{ $('🧩 Parse Brief JSON').first().json.seo_keywords.join(', ') }}",
+            "blog_outline": "={{ $json.candidates[0].content.parts[0].text.slice(0, 4000) }}",
+            "status": "draft"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "0029ba97-9020-4149-b4e6-a164ebc90087",
+      "name": "📊 Sheet: Log Content Calendar",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1500,
+        -140
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account (connect yours)"
+        }
+      },
+      "notes": "Needs a tab named 'Content Calendar' with headers: date | blog_title | seo_keywords | blog_outline | status"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('⚙️ CONFIG').first().json.teamEmail }}",
+        "subject": "=☀️ BrightFunded Daily Brief — {{ $json.date }} ({{ $json.sentiment }})",
+        "emailType": "html",
+        "message": "=<h2>☀️ BrightFunded Daily Market Brief — {{ $json.date }}</h2><p><b>Sentiment:</b> {{ $json.sentiment }} — {{ $json.sentiment_reason }}</p><p>{{ $json.market_summary }}</p><h3>Content angles</h3><ul>{{ $json.content_angles.map(a => '<li>' + a + '</li>').join('') }}</ul><h3>Ready-to-post social copy</h3><p><b>X:</b> {{ $json.post_x }}</p><p><b>LinkedIn:</b> {{ $json.post_linkedin }}</p><p><b>Discord:</b> {{ $json.post_discord }}</p><p><i>Generated automatically by the BrightFunded AI Growth Ops Engine (n8n + Gemini).</i></p>",
+        "options": {}
+      },
+      "id": "45e84585-c274-4df8-b431-59f2d7b067c9",
+      "name": "📧 Gmail: Send Daily Brief",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1260,
+        20
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG').first().json.telegramChatId }}",
+        "text": "=☀️ *BrightFunded Daily Brief — {{ $json.date }}*\n\n*Sentiment:* {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "aee9da45-5165-47b1-8427-92c8cdf1c1d8",
+      "name": "📲 Telegram: Brief Alert",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1260,
+        180
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: \"daily_brief\", date: $json.date, market_summary: $json.market_summary, sentiment: $json.sentiment, sentiment_reason: $json.sentiment_reason, content_angles: $json.content_angles, post_x: $json.post_x, post_linkedin: $json.post_linkedin, post_discord: $json.post_discord, blog_idea: $json.blog_idea, seo_keywords: $json.seo_keywords }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "9195761a-1296-458a-8879-6b8fbaa5c0da",
+      "name": "🖥️ Push to Mission Control",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1260,
+        340
+      ],
+      "notes": "Sends the brief to your Mission Control dashboard. Fails silently if the dashboard is offline.",
+      "settings": {
+        "onError": "continueRegularOutput"
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "brightfunded-lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "470bd29a-ff80-474f-8c18-00aa9cd1e408",
+      "name": "🎣 Webhook: Lead Intake",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -420,
+        340
+      ],
+      "notes": "POST JSON: { name, email, country, experience, capital, message }"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "26d001f5-a066-43b2-b805-68f8ce10de99",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "665dd239-bca0-4783-a7fe-ebeffdc3a50e",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "097a57a0-582f-450d-b092-c2acb6e5f5db",
+      "name": "✅ Valid Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -180,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, error: \"Invalid payload. Required: name, email, country, experience, capital.\" }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "a32dd054-75ba-426d-8b31-dccfa51a0e41",
+      "name": "⛔ Respond 400: Invalid",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        60,
+        460
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const lead = $json.body || {};\nconst prompt = `You are the lead-qualification AI for BrightFunded, a prop trading firm offering funded-trader challenges ($5K/$10K/$25K/$50K/$100K/$200K accounts, 2-step evaluation, 24h payouts, up to 100% profit split).\n\nINCOMING LEAD:\nName: ${lead.name || ''}\nEmail: ${lead.email || ''}\nCountry: ${lead.country || ''}\nTrading experience: ${lead.experience || ''}\nAvailable capital for challenge fee: ${lead.capital || ''}\nMessage: ${lead.message || ''}\n\nTASK — return STRICT JSON only (no markdown) with exactly these keys:\n{\n  \"score\": <integer 1-10, likelihood this lead buys a challenge>,\n  \"persona\": \"one of: Aspiring Beginner | Retail Grinder | Experienced Pro | Funded Veteran | Skeptical Browser\",\n  \"recommended_challenge\": \"e.g. $25K 2-Step Bright\",\n  \"reasoning\": \"2 sentences max\",\n  \"draft_reply\": \"a warm, personalized 100-140 word email reply from the BrightFunded team, referencing their experience and the recommended challenge, with a subtle CTA\"\n}`;\nreturn [{ json: { lead, prompt } }];"
+      },
+      "id": "1dceea78-da0a-4ec5-881d-9c0c3ec1719d",
+      "name": "🧮 Build Scoring Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG (Leads)').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG (Leads)').first().json.geminiApiKey }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 1200, responseMimeType: \"application/json\" } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "077d6e2c-6341-412e-af85-514f944f84d8",
+      "name": "🤖 Gemini: Score Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "let raw = '';\ntry { raw = $json.candidates[0].content.parts[0].text || ''; } catch (e) {}\nraw = raw.replace(/```json|```/g, '').trim();\nlet s = {};\ntry { s = JSON.parse(raw); } catch (e) { const m = raw.match(/\\{[\\s\\S]*\\}/); if (m) { try { s = JSON.parse(m[0]); } catch (e2) {} } }\nconst lead = $('🧮 Build Scoring Prompt').first().json.lead || {};\nreturn [{ json: {\n  received_at: new Date().toISOString(),\n  name: lead.name || '', email: lead.email || '', country: lead.country || '',\n  experience: lead.experience || '', capital: lead.capital || '', message: lead.message || '',\n  score: Number(s.score) || 0,\n  persona: s.persona || 'Unknown',\n  recommended_challenge: s.recommended_challenge || '',\n  reasoning: s.reasoning || '',\n  draft_reply: s.draft_reply || ''\n} }];"
+      },
+      "id": "3da8bdf8-fb3a-4203-9b1a-1644d044ade3",
+      "name": "🧩 Parse Lead Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        280
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, lead: { name: $json.name, email: $json.email }, score: $json.score, persona: $json.persona, recommended_challenge: $json.recommended_challenge, reasoning: $json.reasoning }) }}",
+        "options": {}
+      },
+      "id": "20553a44-607a-45fd-a418-1b22cd59e52b",
+      "name": "📨 Respond 200: Scored",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        780,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('⚙️ CONFIG (Leads)').first().json.googleSheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "70617d83-cfa8-42d0-8773-e9dbc20f972d",
+      "name": "📊 Sheet: Log Lead",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        340
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account (connect yours)"
+        }
+      },
+      "notes": "Needs a tab named 'Leads'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG (Leads)').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: \"lead\", name: $json.name, email: $json.email, country: $json.country, experience: $json.experience, capital: $json.capital, score: $json.score, persona: $json.persona, recommended_challenge: $json.recommended_challenge, reasoning: $json.reasoning }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "eb90cb57-7345-464a-b242-83617fbd760f",
+      "name": "🖥️ Push Lead to Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        500
+      ],
+      "settings": {
+        "onError": "continueRegularOutput"
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "0aa583d7-fbf6-43b6-b973-4f5ccd5c1d8d",
+              "leftValue": "={{ $json.score }}",
+              "rightValue": 7,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b0d956-7648-47aa-a866-1da4ed9a8e4a",
+      "name": "🔥 Hot Lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG (Leads)').first().json.telegramChatId }}",
+        "text": "=🔥 *HOT LEAD — score {{ $json.score }}/10*\n\n👤 {{ $json.name }} ({{ $json.country }})\n📧 {{ $json.email }}\n🎯 Persona: {{ $json.persona }}\n💡 Recommended: {{ $json.recommended_challenge }}\n📝 {{ $json.reasoning }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "0cdc9369-0ba1-4a6e-96bb-fbb78ea60118",
+      "name": "📲 Telegram: HOT LEAD",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1260,
+        240
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Re: Your BrightFunded challenge, {{ $json.name }}",
+        "emailType": "text",
+        "message": "={{ $json.draft_reply }}",
+        "options": {}
+      },
+      "id": "1784b062-14a0-45a3-bc0a-3cffa0493732",
+      "name": "📧 Gmail: Priority Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1260,
+        400
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      },
+      "notes": "Sends the AI-drafted personalized reply to the hot lead. Review drafts in the Leads sheet if you prefer manual approval."
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $json.email }}",
+        "subject": "=Thanks for reaching out to BrightFunded, {{ $json.name }}",
+        "emailType": "text",
+        "message": "=Hi {{ $json.name }},\n\nThanks for your interest in BrightFunded! Traders with your profile often start with a smaller challenge to get a feel for the platform — with no time limits and 24-hour guaranteed payouts, you can progress at your own pace.\n\nCheck the challenge lineup: https://brightfunded.com/\n\nHappy trading,\nThe BrightFunded Team",
+        "options": {}
+      },
+      "id": "5c5e22a4-5918-4ec4-aa77-e28a3a4cd387",
+      "name": "📧 Gmail: Nurture Reply",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1260,
+        560
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "37415183-1b42-40b5-b4b1-220028de35e5",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "e9369f0b-dc31-4a71-92f6-05e7b52b31e5",
+              "name": "googleSheetId",
+              "type": "string",
+              "value": "PASTE_YOUR_GOOGLE_SHEET_ID"
+            },
+            {
+              "id": "912b01cf-d21e-43cc-923e-dfbb08476e96",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "15db54e6-d2d1-428a-bc26-b64501fb769b",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "19d4fdbf-742d-43b2-9efe-eb121aa7e1a0",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "4bbc64c0-6b71-4393-bd76-7d1114ec7e3f",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash"
+            }
+          ]
+        },
+        "options": {
+          "include": "all"
+        }
+      },
+      "id": "4758a248-e523-4211-95c3-3ae04f7fc0b1",
+      "name": "⚙️ CONFIG (Leads)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -300,
+        500
+      ],
+      "notes": "Same values as the main CONFIG node (n8n expressions can only read nodes that ran in THIS execution)"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "17 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "7dad7d12-e504-4168-b496-1b21c247ecab",
+      "name": "⏰ Schedule: Hourly",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -420,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7c8c2a03-ae1e-4ad2-ab43-4b1783491ce3",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "d428441c-d4fe-40e7-a235-685871292f51",
+              "name": "googleSheetId",
+              "type": "string",
+              "value": "PASTE_YOUR_GOOGLE_SHEET_ID"
+            },
+            {
+              "id": "58bfd6fb-aa6b-49f0-a909-6f575f07bc2d",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "0c8e8fbc-d3fb-4dd6-bae6-90d1bb3fa01f",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "0380fd04-afc5-4a5c-8cca-a250c69f9fc0",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "fb919ac4-296d-40aa-9d64-29286113b4dc",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2b841a32-3104-47e9-ae1b-85750150eabc",
+      "name": "⚙️ CONFIG (Monitor)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://brightfunded.com/",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "id": "b36e50dc-753e-4d81-9469-3214dd0e6627",
+      "name": "🌐 Check brightfunded.com",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        800
+      ],
+      "settings": {
+        "onError": "continueErrorOutput"
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://www.trustpilot.com/review/brightfunded.com",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          },
+          "headers": {
+            "headerParameters": [
+              {
+                "name": "User-Agent",
+                "value": "Mozilla/5.0 (compatible; BrightOpsBot/1.0)"
+              }
+            ]
+          }
+        }
+      },
+      "id": "e48621b7-0d3e-4497-bc68-44d94d174928",
+      "name": "⭐ Scrape Trustpilot Rating",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        60,
+        960
+      ],
+      "settings": {
+        "onError": "continueRegularOutput"
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Input 0 (merged): site check result or error; Trustpilot HTML referenced directly\nlet statusCode = 0, siteOk = false;\nconst siteItem = $input.all()[0].json;\nif (siteItem.error) { statusCode = 0; siteOk = false; }\nelse { siteOk = true; statusCode = 200; }\n\nlet rating = null;\ntry {\n  const tp = ($('⭐ Scrape Trustpilot Rating').first().json.data || '').toString();\n  const m = tp.match(/ratingValue[^0-9]*([0-9.]+)/i) || tp.match(/([0-9]\\.[0-9])\\s*out of 5/i);\n  if (m) rating = parseFloat(m[1]);\n} catch (e) {}\n\nreturn [{ json: {\n  checked_at: new Date().toISOString(),\n  url: 'https://brightfunded.com',\n  site_up: siteOk,\n  status_code: statusCode,\n  trustpilot_rating: rating\n} }];"
+      },
+      "id": "0f401f0e-cc59-42ee-807c-b15b66272aef",
+      "name": "🧮 Compute Health",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "id": "9d43f123-53ac-4960-bf95-61242fd70d7b",
+              "leftValue": "={{ $json.site_up }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "cd33bdc3-1474-49d8-abca-443b71dfe39b",
+      "name": "🚦 Site Healthy?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        540,
+        860
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('⚙️ CONFIG (Monitor)').first().json.googleSheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Uptime Log",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "88131b3d-a7e0-45ca-abc3-a6bba3b5e248",
+      "name": "📊 Sheet: Log Uptime",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        780,
+        780
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account (connect yours)"
+        }
+      },
+      "notes": "Needs a tab named 'Uptime Log'"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG (Monitor)').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: \"health\", checked_at: $json.checked_at, site_up: $json.site_up, status_code: $json.status_code, trustpilot_rating: $json.trustpilot_rating }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "id": "5c464c51-2978-4bfb-9a0a-689c236f860a",
+      "name": "🖥️ Push Health to Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        780,
+        940
+      ],
+      "settings": {
+        "onError": "continueRegularOutput"
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG (Monitor)').first().json.telegramChatId }}",
+        "text": "=🚨 *brightfunded.com appears DOWN* (or unreachable)\nStatus: {{ $json.status_code }}\nTime: {{ $json.checked_at }}\nCheck it immediately — a promo could be live.",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "f7901568-0136-4ab1-ab01-5b2ae7dbae51",
+      "name": "📲 Telegram: SITE DOWN",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        780,
+        1100
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "sheetWithinDocument",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('⚙️ CONFIG (Monitor)').first().json.googleSheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Incidents",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "id": "42027ada-3bc3-4e99-b0b4-28295ce3557c",
+      "name": "📊 Sheet: Log Incident",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1020,
+        1100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "",
+          "name": "Google Sheets account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "f0480f92-b702-42a6-b64f-e09fdc3d213e",
+      "name": "⚠️ Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae0ba4ea-a6f8-4165-b1a9-5752503a2dd2",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "448e33ad-0982-4123-ba75-6d425b933820",
+              "name": "googleSheetId",
+              "type": "string",
+              "value": "PASTE_YOUR_GOOGLE_SHEET_ID"
+            },
+            {
+              "id": "4db3e942-fffc-4866-b84a-18b718f37d00",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "44151922-4eb1-4ace-8332-b5b6417bb86c",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "686a247f-867e-4ab5-838d-de594dfa3b5d",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "4b991368-fa1b-4695-a835-1cb5b96b9746",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash"
+            }
+          ]
+        },
+        "options": {
+          "include": "all"
+        }
+      },
+      "id": "d9998b05-a0e7-4fa0-a509-6b69cb0e90a9",
+      "name": "⚙️ CONFIG (Errors)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -180,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const e = $json;\nconst wf = (e.workflow && e.workflow.name) || 'unknown workflow';\nconst node = (e.execution && e.execution.lastNodeExecuted) || 'unknown node';\nconst msg = (e.execution && e.execution.error && e.execution.error.message) || 'unknown error';\nconst url = (e.execution && e.execution.url) || '';\nreturn [{ json: { wf, node, msg, url, at: new Date().toISOString() } }];"
+      },
+      "id": "b524dff3-f1ab-4d11-9fab-0c02a59e6e71",
+      "name": "🧮 Format Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        1220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG (Errors)').first().json.telegramChatId }}",
+        "text": "=❗ *Workflow error*\nWorkflow: {{ $json.wf }}\nNode: {{ $json.node }}\nError: {{ $json.msg }}\n{{ $json.url }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "980b4f07-4797-4457-abfe-94acdc525b5a",
+      "name": "📲 Telegram: Workflow Error",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        300,
+        1150
+      ],
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('⚙️ CONFIG (Errors)').first().json.teamEmail }}",
+        "subject": "=❗ n8n workflow error: {{ $json.wf }}",
+        "emailType": "text",
+        "message": "=Workflow: {{ $json.wf }}\nFailed node: {{ $json.node }}\nError: {{ $json.msg }}\nExecution: {{ $json.url }}\nTime: {{ $json.at }}",
+        "options": {}
+      },
+      "id": "7f5721cd-3db2-42e7-bb84-2ee5b5bc74a0",
+      "name": "📧 Gmail: Error Report",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        300,
+        1300
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "▶️ Manual: Run Demo Now": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏰ Schedule: Daily 08:00": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG": {
+      "main": [
+        [
+          {
+            "node": "RSS: FXStreet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS: ForexLive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "RSS: CoinDesk",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🌐 Scrape brightfunded.com",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS: FXStreet": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RSS: ForexLive": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "RSS: CoinDesk": {
+      "main": [
+        [
+          {
+            "node": "Merge Feeds",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge Feeds": {
+      "main": [
+        [
+          {
+            "node": "🧮 Aggregate & Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🌐 Scrape brightfunded.com": {
+      "main": [
+        [
+          {
+            "node": "🧮 Aggregate & Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧮 Aggregate & Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Daily Brief",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Daily Brief": {
+      "main": [
+        [
+          {
+            "node": "🧩 Parse Brief JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧩 Parse Brief JSON": {
+      "main": [
+        [
+          {
+            "node": "📊 Sheet: Log Daily Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🤖 Gemini: Blog Outline",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📧 Gmail: Send Daily Brief",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📲 Telegram: Brief Alert",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🖥️ Push to Mission Control",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Blog Outline": {
+      "main": [
+        [
+          {
+            "node": "📊 Sheet: Log Content Calendar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎣 Webhook: Lead Intake": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Leads)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ Valid Lead?": {
+      "main": [
+        [
+          {
+            "node": "🧮 Build Scoring Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "⛔ Respond 400: Invalid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧮 Build Scoring Prompt": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Score Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Score Lead": {
+      "main": [
+        [
+          {
+            "node": "🧩 Parse Lead Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧩 Parse Lead Score": {
+      "main": [
+        [
+          {
+            "node": "📨 Respond 200: Scored",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📊 Sheet: Log Lead",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🖥️ Push Lead to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Sheet: Log Lead": {
+      "main": [
+        [
+          {
+            "node": "🔥 Hot Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔥 Hot Lead?": {
+      "main": [
+        [
+          {
+            "node": "📲 Telegram: HOT LEAD",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📧 Gmail: Nurture Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📲 Telegram: HOT LEAD": {
+      "main": [
+        [
+          {
+            "node": "📧 Gmail: Priority Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG (Leads)": {
+      "main": [
+        [
+          {
+            "node": "✅ Valid Lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏰ Schedule: Hourly": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Monitor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG (Monitor)": {
+      "main": [
+        [
+          {
+            "node": "🌐 Check brightfunded.com",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "⭐ Scrape Trustpilot Rating",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🌐 Check brightfunded.com": {
+      "main": [
+        [
+          {
+            "node": "🧮 Compute Health",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🧮 Compute Health",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧮 Compute Health": {
+      "main": [
+        [
+          {
+            "node": "🚦 Site Healthy?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🚦 Site Healthy?": {
+      "main": [
+        [
+          {
+            "node": "📊 Sheet: Log Uptime",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🖥️ Push Health to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "📲 Telegram: SITE DOWN",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📲 Telegram: SITE DOWN": {
+      "main": [
+        [
+          {
+            "node": "📊 Sheet: Log Incident",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚠️ Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Errors)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG (Errors)": {
+      "main": [
+        [
+          {
+            "node": "🧮 Format Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧮 Format Error": {
+      "main": [
+        [
+          {
+            "node": "📲 Telegram: Workflow Error",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📧 Gmail: Error Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "timezone": "Europe/Amsterdam"
+  },
+  "staticData": null,
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
