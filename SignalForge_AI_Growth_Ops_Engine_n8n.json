@@ -532,7 +532,10 @@
       "notes": "Sends the brief to your Mission Control dashboard. Fails silently if the dashboard is offline.",
       "settings": {
         "onError": "continueRegularOutput"
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -729,7 +732,10 @@
       ],
       "settings": {
         "onError": "continueRegularOutput"
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1164,7 +1170,10 @@
       ],
       "settings": {
         "onError": "continueRegularOutput"
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
