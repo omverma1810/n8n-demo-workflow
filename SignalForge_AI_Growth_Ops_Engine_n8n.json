@@ -1,9 +1,9 @@
 {
-  "name": "☀️ BrightFunded — AI Growth Ops Engine",
+  "name": "☀️ SignalForge — AI Growth Ops Engine",
   "nodes": [
     {
       "parameters": {
-        "content": "## ☀️ BrightFunded — AI Growth Ops Engine\n\n**4 autonomous pipelines, 100% free stack** (Gemini API free tier + Google Sheets + Gmail + Telegram).\n\n### Before you run:\n1. Open the **⚙️ CONFIG** node and fill in: `geminiApiKey`, `googleSheetId`, `telegramChatId`, `teamEmail`, `dashboardWebhookUrl`\n2. Attach your own credentials to the Google Sheets / Gmail / Telegram nodes\n3. Activate the workflow 🚀\n\nPipelines:\n- **A. Market Intel & Content Engine** (daily 08:00)\n- **B. Lead Intake & AI Scoring** (webhook)\n- **C. Site & Reputation Monitor** (hourly)\n- **D. Global Error Handler** (set this workflow as its own error workflow in Settings)",
+        "content": "## ☀️ SignalForge — AI Growth Ops Engine\n\n**4 autonomous pipelines, 100% free stack** (Gemini API free tier + Google Sheets + Gmail + Telegram).\n\n### Before you run:\n1. Open the **⚙️ CONFIG** node and fill in: `brandName`, `targetUrl`, `trustpilotDomain`, `geminiApiKey`, `googleSheetId`, `telegramChatId`, `teamEmail`, `dashboardWebhookUrl`\n2. Attach your own credentials to the Google Sheets / Gmail / Telegram nodes\n3. Activate the workflow 🚀\n\nPipelines:\n- **A. Market Intel & Content Engine** (daily 08:00)\n- **B. Lead Intake & AI Scoring** (webhook)\n- **C. Site & Reputation Monitor** (hourly)\n- **D. Global Error Handler** (set this workflow as its own error workflow in Settings)",
         "width": 460,
         "height": 420,
         "color": 5
@@ -19,7 +19,7 @@
     },
     {
       "parameters": {
-        "content": "## 🅰️ Daily Market Intel & Content Engine\n\nEvery morning at 08:00:\n1. Pulls **3 trading RSS feeds** (FXStreet, ForexLive, CoinDesk)\n2. Scrapes **brightfunded.com** for live promo context\n3. **Gemini** writes a market brief, sentiment score, content angles, and ready-to-post social copy (X / LinkedIn / Discord)\n4. Gemini drafts a **blog post outline**\n5. Logs everything to **Google Sheets**, emails the brief to the team, pings **Telegram**, and pushes it to the **Mission Control dashboard**",
+        "content": "## 🅰️ Daily Market Intel & Content Engine\n\nEvery morning at 08:00:\n1. Pulls **3 trading RSS feeds** (FXStreet, ForexLive, CoinDesk)\n2. Scrapes the **client's target site** for live context\n3. **Gemini** writes a market brief, sentiment score, content angles, and ready-to-post social copy (X / LinkedIn / Discord)\n4. Gemini drafts a **blog post outline**\n5. Logs everything to **Google Sheets**, emails the brief to the team, pings **Telegram**, and pushes it to the **Mission Control dashboard**",
         "width": 460,
         "height": 320,
         "color": 4
@@ -35,7 +35,7 @@
     },
     {
       "parameters": {
-        "content": "## 🅱️ Lead Intake & AI Scoring\n\n`POST /webhook/brightfunded-lead` with JSON `{ name, email, country, experience, capital, message }`\n\n1. Validates the payload\n2. **Gemini scores the lead 1–10**, classifies the trader persona, recommends a challenge size and drafts a personalized reply\n3. Logs to the **Leads** sheet + dashboard\n4. **Hot leads (≥7)** → instant Telegram alert + priority email\n5. Everyone else → nurture email\n6. Responds to the caller with the full scoring JSON",
+        "content": "## 🅱️ Lead Intake & AI Scoring\n\n`POST /webhook/signalforge-lead` with JSON `{ name, email, country, experience, capital, message }`\n\n1. Validates the payload\n2. **Gemini scores the lead 1–10**, classifies the trader persona, recommends a challenge size and drafts a personalized reply\n3. Logs to the **Leads** sheet + dashboard\n4. **Hot leads (≥7)** → instant Telegram alert + priority email\n5. Everyone else → nurture email\n6. Responds to the caller with the full scoring JSON",
         "width": 460,
         "height": 320,
         "color": 6
@@ -51,7 +51,7 @@
     },
     {
       "parameters": {
-        "content": "## 🅲 Site & Reputation Monitor\n\nEvery hour:\n1. Checks **brightfunded.com** availability + status code\n2. Scrapes the Trustpilot rating\n3. Logs uptime to Sheets + dashboard\n4. **Downtime or rating drop → instant Telegram alert**\n\nNever get caught off-guard during a promo again.",
+        "content": "## 🅲 Site & Reputation Monitor\n\nEvery hour:\n1. Checks the **target site's** availability + status code\n2. Scrapes the Trustpilot rating\n3. Logs uptime to Sheets + dashboard\n4. **Downtime or rating drop → instant Telegram alert**\n\nNever get caught off-guard during a promo again.",
         "width": 460,
         "height": 260,
         "color": 3
@@ -151,6 +151,24 @@
               "name": "geminiModel",
               "type": "string",
               "value": "gemini-2.5-flash"
+            },
+            {
+              "id": "cfg-CONFIG-0",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            },
+            {
+              "id": "cfg-CONFIG-1",
+              "name": "targetUrl",
+              "type": "string",
+              "value": "https://www.fxstreet.com/"
+            },
+            {
+              "id": "cfg-CONFIG-2",
+              "name": "trustpilotDomain",
+              "type": "string",
+              "value": "fxstreet.com"
             }
           ]
         },
@@ -164,7 +182,7 @@
         -180,
         -20
       ],
-      "notes": "👈 Fill in these 5 values once. Get a FREE Gemini key at https://aistudio.google.com/apikey"
+      "notes": "👈 Client settings: brandName, targetUrl (site to monitor), trustpilotDomain, plus API keys. Free Gemini key: https://aistudio.google.com/apikey"
     },
     {
       "parameters": {
@@ -210,7 +228,7 @@
     },
     {
       "parameters": {
-        "url": "https://brightfunded.com/",
+        "url": "={{ $('⚙️ CONFIG').first().json.targetUrl }}",
         "options": {
           "timeout": 20000,
           "response": {
@@ -221,7 +239,7 @@
         }
       },
       "id": "88556122-43e0-4a7d-9504-005f1b66f792",
-      "name": "🌐 Scrape brightfunded.com",
+      "name": "🌐 Scrape target site",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -249,7 +267,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Gather RSS headlines + BrightFunded site context, build the Gemini prompt\nconst feedItems = $input.all()\n  .filter(i => i.json && i.json.title)\n  .slice(0, 18)\n  .map(i => ({ title: i.json.title, source: (i.json.link || '').split('/')[2] || 'rss', published: i.json.pubDate || i.json.isoDate || '' }));\n\nlet siteTitle = '';\nlet siteSnippet = '';\ntry {\n  const html = ($('🌐 Scrape brightfunded.com').first().json.data || '').toString();\n  const t = html.match(/<title[^>]*>([^<]+)<\\/title>/i);\n  siteTitle = t ? t[1].trim() : '';\n  const txt = html.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  siteSnippet = txt.slice(0, 1200);\n} catch (e) { /* site scrape optional */ }\n\nconst today = new Date().toISOString().slice(0, 10);\n\nconst prompt = `You are the growth-operations AI for BrightFunded, a modern proprietary trading firm (funded trader challenges from $5K to $200K, up to 100% profit split, 24-hour guaranteed payouts, platforms MT5/cTrader/DXtrade, 40,000+ traders in 155+ countries).\n\nTODAY: ${today}\n\nBRIGHTFUNDED HOMEPAGE SNAPSHOT:\nTitle: ${siteTitle}\nContent snippet: ${siteSnippet}\n\nLATEST MARKET HEADLINES (RSS):\n${feedItems.map((h, i) => `${i + 1}. [${h.source}] ${h.title}`).join('\\n')}\n\nTASK — return STRICT JSON only (no markdown, no backticks) with exactly these keys:\n{\n  \"market_summary\": \"3-4 sentence digest of what moved markets and why it matters to retail prop traders\",\n  \"sentiment\": \"risk-on | risk-off | mixed\",\n  \"sentiment_reason\": \"one sentence\",\n  \"content_angles\": [\"angle 1\", \"angle 2\", \"angle 3\"],\n  \"social_posts\": {\n    \"x\": \"max 260 chars, punchy, include hashtags #BrightFunded #PropTrading\",\n    \"linkedin\": \"120-180 words, professional tone\",\n    \"discord\": \"community style, emojis allowed, 2-4 lines\"\n  },\n  \"blog_idea\": \"one blog title for brightfunded.com/blog tied to today's markets\",\n  \"seo_keywords\": [\"kw1\", \"kw2\", \"kw3\", \"kw4\", \"kw5\"]\n}`;\n\nreturn [{ json: { date: today, headlines: feedItems, siteTitle, prompt } }];"
+        "jsCode": "// Gather RSS headlines + target-site context, build the Gemini prompt\nconst feedItems = $input.all()\n  .filter(i => i.json && i.json.title)\n  .slice(0, 18)\n  .map(i => ({ title: i.json.title, source: (i.json.link || '').split('/')[2] || 'rss', published: i.json.pubDate || i.json.isoDate || '' }));\n\nlet siteTitle = '';\nlet siteSnippet = '';\ntry {\n  const html = ($('🌐 Scrape target site').first().json.data || '').toString();\n  const t = html.match(/<title[^>]*>([^<]+)<\\/title>/i);\n  siteTitle = t ? t[1].trim() : '';\n  const txt = html.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ').replace(/<style[\\s\\S]*?<\\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\\s+/g, ' ').trim();\n  siteSnippet = txt.slice(0, 1200);\n} catch (e) { /* site scrape optional */ }\n\nconst brand = $('⚙️ CONFIG').first().json.brandName;\nconst today = new Date().toISOString().slice(0, 10);\n\nconst prompt = `You are the growth-operations AI for ${brand}, a proprietary trading firm offering funded-trader challenges with profit splits and fast payouts.\n\nTODAY: ${today}\n\nTARGET WEBSITE SNAPSHOT (market context):\nTitle: ${siteTitle}\nContent snippet: ${siteSnippet}\n\nLATEST MARKET HEADLINES (RSS):\n${feedItems.map((h, i) => `${i + 1}. [${h.source}] ${h.title}`).join('\\n')}\n\nTASK — return STRICT JSON only (no markdown, no backticks) with exactly these keys:\n{\n  \"market_summary\": \"3-4 sentence digest of what moved markets and why it matters to retail prop traders\",\n  \"sentiment\": \"risk-on | risk-off | mixed\",\n  \"sentiment_reason\": \"one sentence\",\n  \"content_angles\": [\"angle 1\", \"angle 2\", \"angle 3\"],\n  \"social_posts\": {\n    \"x\": \"max 260 chars, punchy, include relevant hashtags such as #PropTrading\",\n    \"linkedin\": \"120-180 words, professional tone\",\n    \"discord\": \"community style, emojis allowed, 2-4 lines\"\n  },\n  \"blog_idea\": \"one blog title for the firm's blog tied to today's markets\",\n  \"seo_keywords\": [\"kw1\", \"kw2\", \"kw3\", \"kw4\", \"kw5\"]\n}`;\n\nreturn [{ json: { date: today, headlines: feedItems, siteTitle, prompt } }];"
       },
       "id": "ad3567cf-c839-4e7f-92a9-9429098f5e17",
       "name": "🧮 Aggregate & Build Prompt",
@@ -337,7 +355,7 @@
         "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG').first().json.geminiApiKey }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are BrightFunded's content strategist. Write a detailed blog post outline (markdown: H2/H3 sections, 3 bullet points each, suggested CTA to start a challenge) for this title: \" + $json.blog_idea + \"\\nTarget keywords: \" + $json.seo_keywords.join(\", \") + \"\\nAudience: retail forex/crypto traders considering prop firm challenges. Mention BrightFunded benefits naturally: 24h guaranteed payouts, up to 100% profit split, no time limits.\" }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }) }}",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are the content strategist for \" + $('⚙️ CONFIG').first().json.brandName + \". Write a detailed blog post outline (markdown: H2/H3 sections, 3 bullet points each, suggested CTA to start a challenge) for this title: \" + $json.blog_idea + \"\\nTarget keywords: \" + $json.seo_keywords.join(\", \") + \"\\nAudience: retail forex/crypto traders considering prop firm challenges. Mention the firm's benefits naturally: fast payouts, generous profit split, no time limits.\" }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }) }}",
         "options": {
           "timeout": 60000
         }
@@ -400,9 +418,9 @@
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $('⚙️ CONFIG').first().json.teamEmail }}",
-        "subject": "=☀️ BrightFunded Daily Brief — {{ $json.date }} ({{ $json.sentiment }})",
+        "subject": "=☀️ SignalForge Daily Brief — {{ $json.date }} ({{ $json.sentiment }})",
         "emailType": "html",
-        "message": "=<h2>☀️ BrightFunded Daily Market Brief — {{ $json.date }}</h2><p><b>Sentiment:</b> {{ $json.sentiment }} — {{ $json.sentiment_reason }}</p><p>{{ $json.market_summary }}</p><h3>Content angles</h3><ul>{{ $json.content_angles.map(a => '<li>' + a + '</li>').join('') }}</ul><h3>Ready-to-post social copy</h3><p><b>X:</b> {{ $json.post_x }}</p><p><b>LinkedIn:</b> {{ $json.post_linkedin }}</p><p><b>Discord:</b> {{ $json.post_discord }}</p><p><i>Generated automatically by the BrightFunded AI Growth Ops Engine (n8n + Gemini).</i></p>",
+        "message": "=<h2>☀️ Daily Market Brief — {{ $('⚙️ CONFIG').first().json.brandName }} — {{ $json.date }}</h2><p><b>Sentiment:</b> {{ $json.sentiment }} — {{ $json.sentiment_reason }}</p><p>{{ $json.market_summary }}</p><h3>Content angles</h3><ul>{{ $json.content_angles.map(a => '<li>' + a + '</li>').join('') }}</ul><h3>Ready-to-post social copy</h3><p><b>X:</b> {{ $json.post_x }}</p><p><b>LinkedIn:</b> {{ $json.post_linkedin }}</p><p><b>Discord:</b> {{ $json.post_discord }}</p><p><i>Generated automatically by SignalForge AI Growth Ops Engine (n8n + Gemini).</i></p>",
         "options": {}
       },
       "id": "45e84585-c274-4df8-b431-59f2d7b067c9",
@@ -425,7 +443,7 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG').first().json.telegramChatId }}",
-        "text": "=☀️ *BrightFunded Daily Brief — {{ $json.date }}*\n\n*Sentiment:* {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
+        "text": "=☀️ *{{ $('⚙️ CONFIG').first().json.brandName }} Daily Brief — {{ $json.date }}*\n\n*Sentiment:* {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
         "additionalFields": {
           "parse_mode": "Markdown"
         }
@@ -472,7 +490,7 @@
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "brightfunded-lead",
+        "path": "signalforge-lead",
         "responseMode": "responseNode",
         "options": {}
       },
@@ -542,7 +560,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const lead = $json.body || {};\nconst prompt = `You are the lead-qualification AI for BrightFunded, a prop trading firm offering funded-trader challenges ($5K/$10K/$25K/$50K/$100K/$200K accounts, 2-step evaluation, 24h payouts, up to 100% profit split).\n\nINCOMING LEAD:\nName: ${lead.name || ''}\nEmail: ${lead.email || ''}\nCountry: ${lead.country || ''}\nTrading experience: ${lead.experience || ''}\nAvailable capital for challenge fee: ${lead.capital || ''}\nMessage: ${lead.message || ''}\n\nTASK — return STRICT JSON only (no markdown) with exactly these keys:\n{\n  \"score\": <integer 1-10, likelihood this lead buys a challenge>,\n  \"persona\": \"one of: Aspiring Beginner | Retail Grinder | Experienced Pro | Funded Veteran | Skeptical Browser\",\n  \"recommended_challenge\": \"e.g. $25K 2-Step Bright\",\n  \"reasoning\": \"2 sentences max\",\n  \"draft_reply\": \"a warm, personalized 100-140 word email reply from the BrightFunded team, referencing their experience and the recommended challenge, with a subtle CTA\"\n}`;\nreturn [{ json: { lead, prompt } }];"
+        "jsCode": "const lead = $json.body || {};\nconst brand = $('⚙️ CONFIG (Leads)').first().json.brandName;\nconst prompt = `You are the lead-qualification AI for ${brand}, a prop trading firm offering funded-trader challenges ($5K/$10K/$25K/$50K/$100K/$200K accounts, 2-step evaluation, fast payouts, high profit split).\n\nINCOMING LEAD:\nName: ${lead.name || ''}\nEmail: ${lead.email || ''}\nCountry: ${lead.country || ''}\nTrading experience: ${lead.experience || ''}\nAvailable capital for challenge fee: ${lead.capital || ''}\nMessage: ${lead.message || ''}\n\nTASK — return STRICT JSON only (no markdown) with exactly these keys:\n{\n  \"score\": <integer 1-10, likelihood this lead buys a challenge>,\n  \"persona\": \"one of: Aspiring Beginner | Retail Grinder | Experienced Pro | Funded Veteran | Skeptical Browser\",\n  \"recommended_challenge\": \"e.g. $25K 2-Step Challenge\",\n  \"reasoning\": \"2 sentences max\",\n  \"draft_reply\": \"a warm, personalized 100-140 word email reply from the ${brand} team, referencing their experience and the recommended challenge, with a subtle CTA\"\n}`;\nreturn [{ json: { lead, prompt } }];"
       },
       "id": "1dceea78-da0a-4ec5-881d-9c0c3ec1719d",
       "name": "🧮 Build Scoring Prompt",
@@ -718,7 +736,7 @@
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $json.email }}",
-        "subject": "=Re: Your BrightFunded challenge, {{ $json.name }}",
+        "subject": "=Re: Your {{ $('⚙️ CONFIG (Leads)').first().json.brandName }} challenge, {{ $json.name }}",
         "emailType": "text",
         "message": "={{ $json.draft_reply }}",
         "options": {}
@@ -744,9 +762,9 @@
         "resource": "message",
         "operation": "send",
         "sendTo": "={{ $json.email }}",
-        "subject": "=Thanks for reaching out to BrightFunded, {{ $json.name }}",
+        "subject": "=Thanks for reaching out to {{ $('⚙️ CONFIG (Leads)').first().json.brandName }}, {{ $json.name }}",
         "emailType": "text",
-        "message": "=Hi {{ $json.name }},\n\nThanks for your interest in BrightFunded! Traders with your profile often start with a smaller challenge to get a feel for the platform — with no time limits and 24-hour guaranteed payouts, you can progress at your own pace.\n\nCheck the challenge lineup: https://brightfunded.com/\n\nHappy trading,\nThe BrightFunded Team",
+        "message": "=Hi {{ $json.name }},\n\nThanks for your interest in {{ $('⚙️ CONFIG (Leads)').first().json.brandName }}! Traders with your profile often start with a smaller challenge to get a feel for the platform — with no time limits and fast payouts, you can progress at your own pace.\n\nHappy trading,\nThe {{ $('⚙️ CONFIG (Leads)').first().json.brandName }} Team",
         "options": {}
       },
       "id": "5c5e22a4-5918-4ec4-aa77-e28a3a4cd387",
@@ -803,6 +821,24 @@
               "name": "geminiModel",
               "type": "string",
               "value": "gemini-2.5-flash"
+            },
+            {
+              "id": "cfg-FIGLeads-0",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            },
+            {
+              "id": "cfg-FIGLeads-1",
+              "name": "targetUrl",
+              "type": "string",
+              "value": "https://www.fxstreet.com/"
+            },
+            {
+              "id": "cfg-FIGLeads-2",
+              "name": "trustpilotDomain",
+              "type": "string",
+              "value": "fxstreet.com"
             }
           ]
         },
@@ -879,6 +915,24 @@
               "name": "geminiModel",
               "type": "string",
               "value": "gemini-2.5-flash"
+            },
+            {
+              "id": "cfg-GMonitor-0",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            },
+            {
+              "id": "cfg-GMonitor-1",
+              "name": "targetUrl",
+              "type": "string",
+              "value": "https://www.fxstreet.com/"
+            },
+            {
+              "id": "cfg-GMonitor-2",
+              "name": "trustpilotDomain",
+              "type": "string",
+              "value": "fxstreet.com"
             }
           ]
         },
@@ -895,7 +949,7 @@
     },
     {
       "parameters": {
-        "url": "https://brightfunded.com/",
+        "url": "={{ $('⚙️ CONFIG (Monitor)').first().json.targetUrl }}",
         "options": {
           "timeout": 15000,
           "response": {
@@ -906,7 +960,7 @@
         }
       },
       "id": "b36e50dc-753e-4d81-9469-3214dd0e6627",
-      "name": "🌐 Check brightfunded.com",
+      "name": "🌐 Check target site",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
@@ -919,7 +973,7 @@
     },
     {
       "parameters": {
-        "url": "https://www.trustpilot.com/review/brightfunded.com",
+        "url": "=https://www.trustpilot.com/review/{{ $('⚙️ CONFIG (Monitor)').first().json.trustpilotDomain }}",
         "options": {
           "timeout": 15000,
           "response": {
@@ -931,7 +985,7 @@
             "headerParameters": [
               {
                 "name": "User-Agent",
-                "value": "Mozilla/5.0 (compatible; BrightOpsBot/1.0)"
+                "value": "Mozilla/5.0 (compatible; SignalForgeBot/1.0)"
               }
             ]
           }
@@ -952,7 +1006,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "// Input 0 (merged): site check result or error; Trustpilot HTML referenced directly\nlet statusCode = 0, siteOk = false;\nconst siteItem = $input.all()[0].json;\nif (siteItem.error) { statusCode = 0; siteOk = false; }\nelse { siteOk = true; statusCode = 200; }\n\nlet rating = null;\ntry {\n  const tp = ($('⭐ Scrape Trustpilot Rating').first().json.data || '').toString();\n  const m = tp.match(/ratingValue[^0-9]*([0-9.]+)/i) || tp.match(/([0-9]\\.[0-9])\\s*out of 5/i);\n  if (m) rating = parseFloat(m[1]);\n} catch (e) {}\n\nreturn [{ json: {\n  checked_at: new Date().toISOString(),\n  url: 'https://brightfunded.com',\n  site_up: siteOk,\n  status_code: statusCode,\n  trustpilot_rating: rating\n} }];"
+        "jsCode": "// Input 0 (merged): site check result or error; Trustpilot HTML referenced directly\nlet statusCode = 0, siteOk = false;\nconst siteItem = $input.all()[0].json;\nif (siteItem.error) { statusCode = 0; siteOk = false; }\nelse { siteOk = true; statusCode = 200; }\n\nlet rating = null;\ntry {\n  const tp = ($('⭐ Scrape Trustpilot Rating').first().json.data || '').toString();\n  const m = tp.match(/ratingValue[^0-9]*([0-9.]+)/i) || tp.match(/([0-9]\\.[0-9])\\s*out of 5/i);\n  if (m) rating = parseFloat(m[1]);\n} catch (e) {}\n\nreturn [{ json: {\n  checked_at: new Date().toISOString(),\n  url: $('⚙️ CONFIG (Monitor)').first().json.targetUrl,\n  site_up: siteOk,\n  status_code: statusCode,\n  trustpilot_rating: rating\n} }];"
       },
       "id": "0f401f0e-cc59-42ee-807c-b15b66272aef",
       "name": "🧮 Compute Health",
@@ -1054,7 +1108,7 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG (Monitor)').first().json.telegramChatId }}",
-        "text": "=🚨 *brightfunded.com appears DOWN* (or unreachable)\nStatus: {{ $json.status_code }}\nTime: {{ $json.checked_at }}\nCheck it immediately — a promo could be live.",
+        "text": "=🚨 *Monitored site appears DOWN* ({{ $('⚙️ CONFIG (Monitor)').first().json.targetUrl }})\nStatus: {{ $json.status_code }}\nTime: {{ $json.checked_at }}\nCheck it immediately — a promo could be live.",
         "additionalFields": {
           "parse_mode": "Markdown"
         }
@@ -1159,6 +1213,24 @@
               "name": "geminiModel",
               "type": "string",
               "value": "gemini-2.5-flash"
+            },
+            {
+              "id": "cfg-IGErrors-0",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            },
+            {
+              "id": "cfg-IGErrors-1",
+              "name": "targetUrl",
+              "type": "string",
+              "value": "https://www.fxstreet.com/"
+            },
+            {
+              "id": "cfg-IGErrors-2",
+              "name": "trustpilotDomain",
+              "type": "string",
+              "value": "fxstreet.com"
             }
           ]
         },
@@ -1282,7 +1354,7 @@
             "index": 0
           },
           {
-            "node": "🌐 Scrape brightfunded.com",
+            "node": "🌐 Scrape target site",
             "type": "main",
             "index": 0
           }
@@ -1333,7 +1405,7 @@
         ]
       ]
     },
-    "🌐 Scrape brightfunded.com": {
+    "🌐 Scrape target site": {
       "main": [
         [
           {
@@ -1546,7 +1618,7 @@
       "main": [
         [
           {
-            "node": "🌐 Check brightfunded.com",
+            "node": "🌐 Check target site",
             "type": "main",
             "index": 0
           },
@@ -1558,7 +1630,7 @@
         ]
       ]
     },
-    "🌐 Check brightfunded.com": {
+    "🌐 Check target site": {
       "main": [
         [
           {

@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: brightfunded-mission-control
+    name: signalforge-mission-control
     runtime: node
     plan: free
     rootDir: app
@@ -14,6 +14,6 @@ services:
       - key: DATABASE_URL
         sync: false # paste the Aiven Service URI in the Render dashboard
       - key: APP_ID
-        value: brightfunded
+        value: signalforge
       - key: APP_SECRET
         generateValue: true

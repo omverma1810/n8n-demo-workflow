@@ -85,7 +85,7 @@ export default function Home() {
             </div>
             <div>
               <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
-                BrightFunded <span className="text-yellow-400">Mission Control</span>
+                SignalForge <span className="text-yellow-400">Mission Control</span>
               </h1>
               <p className="text-xs text-zinc-400 sm:text-sm">
                 AI Growth Ops Engine — n8n + Gemini, running fully on free tiers
@@ -101,7 +101,7 @@ export default function Home() {
               }`}
             >
               <span className={`h-2 w-2 rounded-full ${siteUp ? "animate-pulse bg-emerald-400" : "bg-rose-400"}`} />
-              brightfunded.com {siteUp ? "UP" : "DOWN"}
+              Monitored site {siteUp ? "UP" : "DOWN"}
             </span>
             {s?.trustpilotRating && (
               <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-xs text-zinc-300">
@@ -375,7 +375,7 @@ export default function Home() {
             </Card>
 
             <p className="px-1 text-center text-xs text-zinc-600">
-              BrightFunded AI Growth Ops Engine — 51 nodes, 4 pipelines, $0/month stack
+              SignalForge AI Growth Ops Engine — 4 autonomous pipelines, $0/month stack
             </p>
           </div>
         </div>

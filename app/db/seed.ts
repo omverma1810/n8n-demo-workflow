@@ -13,17 +13,17 @@ async function seed() {
       sentiment: "risk-on",
       sentimentReason: "Soft inflation data boosted equities and crypto while pressuring the dollar.",
       contentAngles: [
-        "How BrightFunded traders capitalized on post-CPI volatility",
+        "How Northbridge Capital traders capitalized on post-CPI volatility",
         "Risk management during high-impact news: the 5-minute rule explained",
         "Why no-time-limit challenges win in choppy macro weeks",
       ],
-      postX: "🚨 CPI came in soft and the dollar slipped — volatility is BACK. BrightFunded traders keep up to 100% of profits on moves like this. Pass the challenge, trade our capital. #BrightFunded #PropTrading #Forex",
+      postX: "🚨 CPI came in soft and the dollar slipped — volatility is BACK. Northbridge Capital traders keep up to 100% of profits on moves like this. Pass the challenge, trade our capital. #NorthbridgeCapital #PropTrading #Forex",
       postLinkedin:
-        "Yesterday's cooler CPI print sent a clear signal: volatility is returning to FX and crypto markets — and prepared traders are being rewarded for it.\n\nAt BrightFunded, our funded traders trade simulated capital up to $400K and keep up to 100% of the profits, paid in real cash within 24 hours — guaranteed.\n\nNo time limits. No consistency rules. Just skill.\n\nIf this week's price action showed you anything, it's that opportunity favors the funded.",
+        "Yesterday's cooler CPI print sent a clear signal: volatility is returning to FX and crypto markets — and prepared traders are being rewarded for it.\n\nAt Northbridge Capital, our funded traders trade simulated capital up to $400K and keep up to 100% of the profits, paid in real cash within 24 hours — guaranteed.\n\nNo time limits. No consistency rules. Just skill.\n\nIf this week's price action showed you anything, it's that opportunity favors the funded.",
       postDiscord:
         "☀️ GM traders! Soft CPI → dollar dip → alt rally 📈\nPerfect week for breakout setups. Remember: funded accounts have a 5-min news restriction — plan around the calendar! 🗓️\nWho caught the EUR/USD move? 👀",
       blogIdea: "Trading the CPI Release: A Funded Trader's Playbook for News Volatility",
-      seoKeywords: ["prop firm", "funded trader", "CPI trading", "forex challenge", "BrightFunded"],
+      seoKeywords: ["prop firm", "funded trader", "CPI trading", "forex challenge", "Northbridge Capital"],
     },
   ]);
 
@@ -36,7 +36,7 @@ async function seed() {
       capital: "€500",
       score: 9,
       persona: "Retail Grinder",
-      recommendedChallenge: "$50K 2-Step Bright",
+      recommendedChallenge: "$50K 2-Step Challenge",
       reasoning: "Experienced swing trader with realistic capital — strong fit for a mid-size challenge and likely to pass both phases.",
     },
     {
@@ -47,7 +47,7 @@ async function seed() {
       capital: "€100",
       score: 6,
       persona: "Aspiring Beginner",
-      recommendedChallenge: "$5K 2-Step Bright",
+      recommendedChallenge: "$5K 2-Step Challenge",
       reasoning: "Early-stage trader with limited budget; a small challenge keeps risk low while he builds consistency.",
     },
     {
@@ -58,7 +58,7 @@ async function seed() {
       capital: "€1,000",
       score: 8,
       persona: "Funded Veteran",
-      recommendedChallenge: "$100K 2-Step Bright",
+      recommendedChallenge: "$100K 2-Step Challenge",
       reasoning: "Already funded elsewhere — high intent and budget; respond fast with scaling-plan details to convert.",
     },
   ]);

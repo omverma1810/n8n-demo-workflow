@@ -1,10 +1,10 @@
-# ☀️ BrightFunded — AI Growth Ops Engine
+# ☀️ SignalForge — AI Growth Ops Engine
 ### n8n Demo Setup Guide (100% free stack)
 
 You received two deliverables:
 
-1. **`BrightFunded_AI_Growth_Ops_Engine_n8n.json`** — a 51-node n8n workflow with 4 autonomous pipelines
-2. **BrightFunded Mission Control** — a live dashboard website that receives the workflow's output via webhook (the version card in this chat previews it)
+1. **`SignalForge_AI_Growth_Ops_Engine_n8n.json`** — a 51-node n8n workflow with 4 autonomous pipelines
+2. **SignalForge Mission Control** — a live dashboard website that receives the workflow's output via webhook (the version card in this chat previews it)
 
 Everything runs on **free tiers**: n8n self-hosted (free forever) or n8n Cloud trial, Gemini API free tier via your Google account, Google Sheets, Gmail, and Telegram.
 
@@ -14,9 +14,9 @@ Everything runs on **free tiers**: n8n self-hosted (free forever) or n8n Cloud t
 
 | Pipeline | Trigger | What it does |
 |---|---|---|
-| 🅰️ **Market Intel & Content Engine** | Daily 08:00 (or manual) | Pulls 3 trading RSS feeds + scrapes brightfunded.com → Gemini writes a market brief, sentiment, content angles, X/LinkedIn/Discord posts + a full blog outline → logs to Google Sheets, emails the team, pings Telegram, updates the dashboard |
-| 🅱️ **Lead Intake & AI Scoring** | Webhook `POST /webhook/brightfunded-lead` | Validates payload → Gemini scores the lead 1–10, classifies persona, recommends a challenge size, drafts a personalized reply → hot leads (≥7) trigger instant Telegram alert + AI-drafted email; others get a nurture email |
-| 🅲 **Site & Reputation Monitor** | Hourly | Checks brightfunded.com availability + scrapes Trustpilot rating → logs uptime → instant Telegram alert if the site goes down |
+| 🅰️ **Market Intel & Content Engine** | Daily 08:00 (or manual) | Pulls 3 trading RSS feeds + scrapes the client's target site → Gemini writes a market brief, sentiment, content angles, X/LinkedIn/Discord posts + a full blog outline → logs to Google Sheets, emails the team, pings Telegram, updates the dashboard |
+| 🅱️ **Lead Intake & AI Scoring** | Webhook `POST /webhook/signalforge-lead` | Validates payload → Gemini scores the lead 1–10, classifies persona, recommends a challenge size, drafts a personalized reply → hot leads (≥7) trigger instant Telegram alert + AI-drafted email; others get a nurture email |
+| 🅲 **Site & Reputation Monitor** | Hourly | Checks the target site's availability + scrapes Trustpilot rating → logs uptime → instant Telegram alert if the site goes down |
 | 🅳 **Global Error Handler** | On any failure | Telegram + email alert with the failed node, error message, and execution link |
 
 ---
@@ -39,12 +39,15 @@ Then open http://localhost:5678
 
 ## Step 3 — Import the workflow
 
-1. In n8n: **⋯ (top right) → Import from File** → select `BrightFunded_AI_Growth_Ops_Engine_n8n.json`
+1. In n8n: **⋯ (top right) → Import from File** → select `SignalForge_AI_Growth_Ops_Engine_n8n.json`
 2. Open the **⚙️ CONFIG** node (there are 4 copies — one per pipeline — fill in all four with the same values):
+   - `brandName` → the client/firm the content is written for (e.g. `Northbridge Capital`)
+   - `targetUrl` → a public site to scrape + monitor (e.g. `https://www.fxstreet.com/`)
+   - `trustpilotDomain` → domain used for the Trustpilot rating lookup (e.g. `fxstreet.com`)
    - `geminiApiKey` → your key from Step 1
    - `googleSheetId` → from Step 4
    - `telegramChatId` → from Step 5
-   - `teamEmail` → your email
+   - `teamEmail` → your email (comma-separate multiple recipients)
    - `dashboardWebhookUrl` → from Step 6
 
 ## Step 4 — Google Sheet (3 min)
@@ -75,7 +78,7 @@ The dashboard is previewed from the version card in this chat. For n8n to reach 
 
 ## Step 7 — Enable the error handler
 
-**Workflow Settings → Error Workflow → select "☀️ BrightFunded — AI Growth Ops Engine"** (it handles its own errors via the ⚠️ Error Trigger).
+**Workflow Settings → Error Workflow → select "☀️ SignalForge — AI Growth Ops Engine"** (it handles its own errors via the ⚠️ Error Trigger).
 
 ## Step 8 — Activate
 
@@ -92,7 +95,7 @@ Toggle the workflow **Active**. Done.
 5. Show the **email + Telegram message** that just arrived
 6. Fire a test lead into Pipeline B:
 ```bash
-curl -X POST https://<your-n8n-host>/webhook/brightfunded-lead \
+curl -X POST https://<your-n8n-host>/webhook/signalforge-lead \
   -H "Content-Type: application/json" \
   -d '{"name":"Alex Meyer","email":"alex@example.com","country":"Germany","experience":"4 years forex, funded at FTMO","capital":"€1000","message":"Looking to scale to a bigger account"}'
 ```
