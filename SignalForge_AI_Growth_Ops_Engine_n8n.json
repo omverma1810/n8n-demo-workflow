@@ -253,7 +253,7 @@
     {
       "parameters": {
         "mode": "append",
-        "numberInputs": 3
+        "numberInputs": 4
       },
       "id": "dc02aa89-41cf-4167-a7da-04cafe93fd37",
       "name": "Merge Feeds",
@@ -284,7 +284,7 @@
         "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG').first().json.geminiApiKey }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 2048, responseMimeType: \"application/json\" } }) }}",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 4096, responseMimeType: \"application/json\", thinkingConfig: { thinkingBudget: 0 } } }) }}",
         "options": {
           "timeout": 60000
         }
@@ -315,7 +315,7 @@
     },
     {
       "parameters": {
-        "resource": "sheetWithinDocument",
+        "resource": "sheet",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -355,7 +355,7 @@
         "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG').first().json.geminiApiKey }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are the content strategist for \" + $('⚙️ CONFIG').first().json.brandName + \". Write a detailed blog post outline (markdown: H2/H3 sections, 3 bullet points each, suggested CTA to start a challenge) for this title: \" + $json.blog_idea + \"\\nTarget keywords: \" + $json.seo_keywords.join(\", \") + \"\\nAudience: retail forex/crypto traders considering prop firm challenges. Mention the firm's benefits naturally: fast payouts, generous profit split, no time limits.\" }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 1500 } }) }}",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: \"You are the content strategist for \" + $('⚙️ CONFIG').first().json.brandName + \". Write a detailed blog post outline (markdown: H2/H3 sections, 3 bullet points each, suggested CTA to start a challenge) for this title: \" + $json.blog_idea + \"\\nTarget keywords: \" + $json.seo_keywords.join(\", \") + \"\\nAudience: retail forex/crypto traders considering prop firm challenges. Mention the firm's benefits naturally: fast payouts, generous profit split, no time limits.\" }] }], generationConfig: { temperature: 0.7, maxOutputTokens: 4096, thinkingConfig: { thinkingBudget: 0 } } }) }}",
         "options": {
           "timeout": 60000
         }
@@ -371,7 +371,7 @@
     },
     {
       "parameters": {
-        "resource": "sheetWithinDocument",
+        "resource": "sheet",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -393,7 +393,53 @@
             "status": "draft"
           },
           "matchingColumns": [],
-          "schema": []
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "blog_title",
+              "displayName": "blog_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "seo_keywords",
+              "displayName": "seo_keywords",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "blog_outline",
+              "displayName": "blog_outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
         },
         "options": {}
       },
@@ -443,10 +489,8 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG').first().json.telegramChatId }}",
-        "text": "=☀️ *{{ $('⚙️ CONFIG').first().json.brandName }} Daily Brief — {{ $json.date }}*\n\n*Sentiment:* {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=☀️ {{ $('⚙️ CONFIG').first().json.brandName }} Daily Brief — {{ $json.date }}\n\nSentiment: {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
+        "additionalFields": {}
       },
       "id": "aee9da45-5165-47b1-8427-92c8cdf1c1d8",
       "name": "📲 Telegram: Brief Alert",
@@ -461,6 +505,9 @@
           "id": "",
           "name": "Telegram account (connect yours)"
         }
+      },
+      "settings": {
+        "onError": "continueRegularOutput"
       }
     },
     {
@@ -527,7 +574,12 @@
               }
             }
           ],
-          "combinator": "and"
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          }
         },
         "options": {}
       },
@@ -577,7 +629,7 @@
         "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG (Leads)').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG (Leads)').first().json.geminiApiKey }}",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 1200, responseMimeType: \"application/json\" } }) }}",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.4, maxOutputTokens: 4096, responseMimeType: \"application/json\", thinkingConfig: { thinkingBudget: 0 } } }) }}",
         "options": {
           "timeout": 60000
         }
@@ -622,7 +674,7 @@
     },
     {
       "parameters": {
-        "resource": "sheetWithinDocument",
+        "resource": "sheet",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -693,7 +745,12 @@
               }
             }
           ],
-          "combinator": "and"
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          }
         },
         "options": {}
       },
@@ -711,10 +768,8 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG (Leads)').first().json.telegramChatId }}",
-        "text": "=🔥 *HOT LEAD — score {{ $json.score }}/10*\n\n👤 {{ $json.name }} ({{ $json.country }})\n📧 {{ $json.email }}\n🎯 Persona: {{ $json.persona }}\n💡 Recommended: {{ $json.recommended_challenge }}\n📝 {{ $json.reasoning }}",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=🔥 HOT LEAD — score {{ $json.score }}/10\n\n👤 {{ $json.name }} ({{ $json.country }})\n📧 {{ $json.email }}\n🎯 Persona: {{ $json.persona }}\n💡 Recommended: {{ $json.recommended_challenge }}\n📝 {{ $json.reasoning }}",
+        "additionalFields": {}
       },
       "id": "0cdc9369-0ba1-4a6e-96bb-fbb78ea60118",
       "name": "📲 Telegram: HOT LEAD",
@@ -729,16 +784,19 @@
           "id": "",
           "name": "Telegram account (connect yours)"
         }
+      },
+      "settings": {
+        "onError": "continueRegularOutput"
       }
     },
     {
       "parameters": {
         "resource": "message",
         "operation": "send",
-        "sendTo": "={{ $json.email }}",
-        "subject": "=Re: Your {{ $('⚙️ CONFIG (Leads)').first().json.brandName }} challenge, {{ $json.name }}",
+        "sendTo": "={{ $('🧩 Parse Lead Score').first().json.email }}",
+        "subject": "=Re: Your {{ $('⚙️ CONFIG (Leads)').first().json.brandName }} challenge, {{ $('🧩 Parse Lead Score').first().json.name }}",
         "emailType": "text",
-        "message": "={{ $json.draft_reply }}",
+        "message": "={{ $('🧩 Parse Lead Score').first().json.draft_reply }}",
         "options": {}
       },
       "id": "1784b062-14a0-45a3-bc0a-3cffa0493732",
@@ -842,9 +900,8 @@
             }
           ]
         },
-        "options": {
-          "include": "all"
-        }
+        "includeOtherFields": true,
+        "options": {}
       },
       "id": "4758a248-e523-4211-95c3-3ae04f7fc0b1",
       "name": "⚙️ CONFIG (Leads)",
@@ -980,15 +1037,16 @@
             "response": {
               "responseFormat": "text"
             }
-          },
-          "headers": {
-            "headerParameters": [
-              {
-                "name": "User-Agent",
-                "value": "Mozilla/5.0 (compatible; SignalForgeBot/1.0)"
-              }
-            ]
           }
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (compatible; SignalForgeBot/1.0)"
+            }
+          ]
         }
       },
       "id": "e48621b7-0d3e-4497-bc68-44d94d174928",
@@ -1031,7 +1089,12 @@
               }
             }
           ],
-          "combinator": "and"
+          "combinator": "and",
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          }
         },
         "options": {}
       },
@@ -1046,7 +1109,7 @@
     },
     {
       "parameters": {
-        "resource": "sheetWithinDocument",
+        "resource": "sheet",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -1126,11 +1189,14 @@
           "id": "",
           "name": "Telegram account (connect yours)"
         }
+      },
+      "settings": {
+        "onError": "continueRegularOutput"
       }
     },
     {
       "parameters": {
-        "resource": "sheetWithinDocument",
+        "resource": "sheet",
         "operation": "append",
         "documentId": {
           "__rl": true,
@@ -1143,8 +1209,62 @@
           "mode": "name"
         },
         "columns": {
-          "mappingMode": "autoMapInputData",
-          "value": {}
+          "mappingMode": "defineBelow",
+          "value": {
+            "checked_at": "={{ $('🧮 Compute Health').first().json.checked_at }}",
+            "url": "={{ $('🧮 Compute Health').first().json.url }}",
+            "site_up": "={{ $('🧮 Compute Health').first().json.site_up }}",
+            "status_code": "={{ $('🧮 Compute Health').first().json.status_code }}",
+            "trustpilot_rating": "={{ $('🧮 Compute Health').first().json.trustpilot_rating }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "checked_at",
+              "displayName": "checked_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "site_up",
+              "displayName": "site_up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status_code",
+              "displayName": "status_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "trustpilot_rating",
+              "displayName": "trustpilot_rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
         },
         "options": {}
       },
@@ -1234,9 +1354,8 @@
             }
           ]
         },
-        "options": {
-          "include": "all"
-        }
+        "includeOtherFields": true,
+        "options": {}
       },
       "id": "d9998b05-a0e7-4fa0-a509-6b69cb0e90a9",
       "name": "⚙️ CONFIG (Errors)",
@@ -1266,10 +1385,8 @@
         "resource": "message",
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG (Errors)').first().json.telegramChatId }}",
-        "text": "=❗ *Workflow error*\nWorkflow: {{ $json.wf }}\nNode: {{ $json.node }}\nError: {{ $json.msg }}\n{{ $json.url }}",
-        "additionalFields": {
-          "parse_mode": "Markdown"
-        }
+        "text": "=❗ Workflow error\nWorkflow: {{ $json.wf }}\nNode: {{ $json.node }}\nError: {{ $json.msg }}\n{{ $json.url }}",
+        "additionalFields": {}
       },
       "id": "980b4f07-4797-4457-abfe-94acdc525b5a",
       "name": "📲 Telegram: Workflow Error",
@@ -1409,9 +1526,9 @@
       "main": [
         [
           {
-            "node": "🧮 Aggregate & Build Prompt",
+            "node": "Merge Feeds",
             "type": "main",
-            "index": 0
+            "index": 3
           }
         ]
       ]
