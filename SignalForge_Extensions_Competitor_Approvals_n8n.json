@@ -1,0 +1,783 @@
+{
+  "name": "☀️ SignalForge — Competitor Watch & Approvals",
+  "nodes": [
+    {
+      "id": "93adab3c-aedf-4e73-bf42-65946800ee93",
+      "name": "▶️ Manual: Run Competitor Watch",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        0
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "10ed7a8c-107b-4272-9598-2af4de13f559",
+      "name": "⏰ Schedule: Competitors Daily 09:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        160
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "89d53990-3ae7-43d7-9593-f39a447a82a2",
+      "name": "⚙️ CONFIG (Competitors)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        80
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c-geminiApiKey",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "c-geminiModel",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash-lite"
+            },
+            {
+              "id": "c-telegramChatId",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "c-teamEmail",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "c-dashboardWebhookUrl",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "c-brandName",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            },
+            {
+              "id": "c-competitors",
+              "name": "competitors",
+              "type": "string",
+              "value": "ftmo.com,fundednext.com,the5ers.com"
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "1eb08b0e-97b8-4f0e-899f-2ac6e56528d5",
+      "name": "Competitor List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Split the configured competitor domains into one item each\nconst raw = $('⚙️ CONFIG (Competitors)').first().json.competitors || '';\nconst domains = raw.split(',').map(d => d.trim()).filter(Boolean);\nreturn domains.map(domain => ({ json: { domain } }));"
+      }
+    },
+    {
+      "id": "9bdf5856-9af4-4c14-acd1-424b4d6894b5",
+      "name": "Trustpilot (competitor)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        320,
+        80
+      ],
+      "parameters": {
+        "url": "=https://r.jina.ai/https://www.trustpilot.com/review/{{ $json.domain }}",
+        "options": {
+          "timeout": 40000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "7f8d4b72-ed3e-4f50-897e-de94485cf9b7",
+      "name": "Homepage (competitor)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        80
+      ],
+      "parameters": {
+        "url": "=https://r.jina.ai/https://{{ $('Competitor List').item.json.domain }}",
+        "options": {
+          "timeout": 40000,
+          "response": {
+            "response": {
+              "responseFormat": "text"
+            }
+          }
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "57559d3a-9be2-496d-b8c6-3f09643f9a59",
+      "name": "Collect Intel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Combine rating + homepage text per competitor and build ONE Gemini prompt\nconst list = $('Competitor List').all();\nconst tp = $('Trustpilot (competitor)').all();\nconst hp = $('Homepage (competitor)').all();\nconst base = [];\nconst blocks = [];\nfor (let i = 0; i < list.length; i++) {\n  const domain = list[i].json.domain;\n  const tpText = ((tp[i] && tp[i].json.data) || '').toString();\n  const hpText = ((hp[i] && hp[i].json.data) || '').toString();\n  let rating = null;\n  const head = tpText.slice(0, 300);\n  const k = head.indexOf(' with ');\n  if (k >= 0) {\n    const m = head.slice(k, k + 20).match(/[0-9][.][0-9]|[0-9]/);\n    if (m) rating = parseFloat(m[0]);\n  }\n  const siteUp = hpText.length > 200;\n  base.push({ domain, rating, site_up: siteUp });\n  const snippet = hpText.split('](').join(' ').slice(0, 1800);\n  blocks.push('### ' + domain + '\\n' + (snippet || '(no content)'));\n}\nconst brand = $('⚙️ CONFIG (Competitors)').first().json.brandName;\nconst prompt = 'You are a competitive-intelligence analyst for ' + brand + ', a proprietary trading firm. Below is scraped homepage text for competitor prop firms. For EACH competitor return its current headline offer (discounts, profit split, payout speed, promo codes) in max 25 words, whether a time-limited promotion is visible, and one short note that matters to a rival. Return STRICT JSON only: an array of objects with keys domain, offer_summary, promo_detected (boolean), notes.\\n\\n' + blocks.join('\\n\\n');\nreturn [{ json: { prompt, base } }];"
+      }
+    },
+    {
+      "id": "0038a739-2b55-40a1-b94b-2259b40fe7ab",
+      "name": "🤖 Gemini: Competitor Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1040,
+        80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/{{ $('⚙️ CONFIG (Competitors)').first().json.geminiModel }}:generateContent?key={{ $('⚙️ CONFIG (Competitors)').first().json.geminiApiKey }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ contents: [{ parts: [{ text: $json.prompt }] }], generationConfig: { temperature: 0.3, maxOutputTokens: 4096, responseMimeType: \"application/json\", thinkingConfig: { thinkingBudget: 0 } } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      }
+    },
+    {
+      "id": "99056a7d-e30e-4e5e-a856-ab649eede73a",
+      "name": "Merge Intel",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Parse Gemini's JSON array and merge it with the ratings\nlet raw = '';\ntry { raw = $json.candidates[0].content.parts[0].text || ''; } catch (e) {}\nraw = raw.split('```json').join('').split('```').join('').trim();\nlet arr = [];\ntry { arr = JSON.parse(raw); } catch (e) {\n  const a = raw.indexOf('['); const b = raw.lastIndexOf(']');\n  if (a >= 0 && b > a) { try { arr = JSON.parse(raw.slice(a, b + 1)); } catch (e2) {} }\n}\nconst base = $('Collect Intel').first().json.base;\nconst items = base.map(b => {\n  const ai = (Array.isArray(arr) ? arr : []).find(x => x && x.domain && b.domain.indexOf(String(x.domain).replace('www.', '')) >= 0) || {};\n  return {\n    domain: b.domain,\n    trustpilot_rating: b.rating,\n    site_up: b.site_up,\n    offer_summary: ai.offer_summary || '(no offer detected)',\n    promo_detected: !!ai.promo_detected,\n    notes: ai.notes || ''\n  };\n});\nreturn [{ json: { type: 'competitor_batch', items } }];"
+      }
+    },
+    {
+      "id": "9739963c-afaa-4247-9c70-f362fdf1afac",
+      "name": "🖥️ Push Competitors to Dashboard",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1520,
+        80
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG (Competitors)').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "6060aabe-7124-4b6a-bd65-d439768e732b",
+      "name": "Build Competitor Digest",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        80
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Turn the dashboard's change report into a human digest\nconst r = $json && $json.changes ? $json : { changes: [], anyChanged: false };\nconst lines = r.changes.map(c => {\n  const arrow = c.delta > 0 ? ' (+' + c.delta + ')' : c.delta < 0 ? ' (' + c.delta + ')' : '';\n  const flag = !c.firstSeen && c.changed ? '🚨 ' : '• ';\n  return flag + c.domain + ' — rating ' + (c.rating || 'n/a') + arrow + (c.promo_detected ? ' · PROMO' : '') + '\\n   ' + c.offer_summary;\n});\nconst title = r.anyChanged ? '🚨 Competitor changes detected' : '🔭 Competitor watch — daily digest';\nreturn [{ json: { anyChanged: !!r.anyChanged, text: title + '\\n\\n' + (lines.join('\\n\\n') || 'No data returned.') } }];"
+      }
+    },
+    {
+      "id": "a326a489-91db-4fb6-bd60-f8c3969a0afd",
+      "name": "📲 Telegram: Competitor Digest",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2000,
+        0
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG (Competitors)').first().json.telegramChatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "53bc720e-d699-487f-985b-fd9478abfd93",
+      "name": "🚨 Changes Detected?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2000,
+        160
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "chg",
+              "leftValue": "={{ $json.anyChanged }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "dc5ef85b-cf75-4d83-801c-c61b5f6a98d6",
+      "name": "📧 Gmail: Competitor Alert",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2240,
+        160
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('⚙️ CONFIG (Competitors)').first().json.teamEmail }}",
+        "subject": "=🚨 Competitor change detected",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "812f4a5f-0d44-4789-b5a8-76d456af16d1",
+      "name": "🎣 Telegram: Approval Button",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        520
+      ],
+      "parameters": {
+        "updates": [
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "07d094ce-3887-4764-8c66-e812c4a3a017",
+      "name": "⚙️ CONFIG (Approvals)",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        520
+      ],
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c-geminiApiKey",
+              "name": "geminiApiKey",
+              "type": "string",
+              "value": "PASTE_YOUR_FREE_GEMINI_API_KEY"
+            },
+            {
+              "id": "c-geminiModel",
+              "name": "geminiModel",
+              "type": "string",
+              "value": "gemini-2.5-flash-lite"
+            },
+            {
+              "id": "c-telegramChatId",
+              "name": "telegramChatId",
+              "type": "string",
+              "value": "PASTE_YOUR_TELEGRAM_CHAT_ID"
+            },
+            {
+              "id": "c-teamEmail",
+              "name": "teamEmail",
+              "type": "string",
+              "value": "team@yourdomain.com"
+            },
+            {
+              "id": "c-dashboardWebhookUrl",
+              "name": "dashboardWebhookUrl",
+              "type": "string",
+              "value": "https://your-dashboard.example.com/api/webhook/n8n"
+            },
+            {
+              "id": "c-brandName",
+              "name": "brandName",
+              "type": "string",
+              "value": "Northbridge Capital"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      }
+    },
+    {
+      "id": "272c258c-4dc8-46aa-9100-53a0a6028ad2",
+      "name": "Parse Decision",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        80,
+        520
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Telegram button press -> decision\nconst cb = $json.callback_query;\nif (!cb || !cb.data) return [];\nconst parts = String(cb.data).split(':');\nconst action = parts[0];\nconst id = Number(parts[1]);\nif (!['approve', 'reject'].includes(action) || !id) return [];\nreturn [{ json: {\n  decision: action === 'approve' ? 'approved' : 'rejected',\n  id,\n  queryId: cb.id,\n  by: (cb.from && (cb.from.username || cb.from.first_name)) || 'telegram'\n} }];"
+      }
+    },
+    {
+      "id": "141b9d1e-6157-4539-a60d-fbd7a7d09c5a",
+      "name": "💬 Telegram: Ack Button",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        320,
+        520
+      ],
+      "parameters": {
+        "resource": "callback",
+        "operation": "answerQuery",
+        "queryId": "={{ $json.queryId }}",
+        "additionalFields": {
+          "text": "Got it — recording your decision…"
+        }
+      },
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "0be4b11c-427f-4674-a9ed-5a67fd4b47e0",
+      "name": "🖥️ Record Decision",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        520
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG (Approvals)').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: \"post_decision\", id: $('Parse Decision').first().json.id, decision: $('Parse Decision').first().json.decision, by: $('Parse Decision').first().json.by }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
+    },
+    {
+      "id": "080d04d8-2724-4c85-88d6-ecc3db201bca",
+      "name": "Build Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        520
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// Build the confirmation message after the dashboard recorded the decision\nconst r = $json || {};\nconst d = $('Parse Decision').first().json;\nconst post = r.post || {};\nlet text;\nlet notify = false;\nif (!r.ok) { text = '⚠️ Could not record the decision for post #' + d.id + ' (' + (r.error || 'dashboard unreachable') + ').'; }\nelse if (r.alreadyDecided) { text = 'ℹ️ Post #' + d.id + ' was already ' + post.status + '.'; }\nelse if (d.decision === 'approved') { text = '✅ Approved post #' + d.id + ' (' + post.platform + '). Final copy emailed to the team.'; notify = true; }\nelse { text = '❌ Rejected post #' + d.id + ' (' + post.platform + '). It will not be published.'; }\nreturn [{ json: { text, notify, id: d.id, platform: post.platform || '', content: post.content || '', by: d.by } }];"
+      }
+    },
+    {
+      "id": "dd6642f6-215b-4e9c-9e23-f9faa495fe75",
+      "name": "📲 Telegram: Decision Result",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1040,
+        440
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG (Approvals)').first().json.telegramChatId }}",
+        "text": "={{ $json.text }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "6c663f33-2481-46bc-afcb-8e93d76ba498",
+      "name": "👍 Approved & New?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        600
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "ntf",
+              "leftValue": "={{ $json.notify }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "a8631102-05b9-48b4-9883-886e45cff056",
+      "name": "📧 Gmail: Approved Post Ready",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        600
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "send",
+        "sendTo": "={{ $('⚙️ CONFIG (Approvals)').first().json.teamEmail }}",
+        "subject": "=✅ Approved — ready to publish: {{ $json.platform }} post #{{ $json.id }}",
+        "emailType": "text",
+        "message": "=This post was approved by {{ $json.by }} and is ready to publish:\n\n{{ $json.content }}",
+        "options": {}
+      },
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "",
+          "name": "Gmail account (connect yours)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "▶️ Manual: Run Competitor Watch": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Competitors)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏰ Schedule: Competitors Daily 09:00": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Competitors)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG (Competitors)": {
+      "main": [
+        [
+          {
+            "node": "Competitor List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor List": {
+      "main": [
+        [
+          {
+            "node": "Trustpilot (competitor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trustpilot (competitor)": {
+      "main": [
+        [
+          {
+            "node": "Homepage (competitor)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Homepage (competitor)": {
+      "main": [
+        [
+          {
+            "node": "Collect Intel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Intel": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Competitor Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🤖 Gemini: Competitor Analysis": {
+      "main": [
+        [
+          {
+            "node": "Merge Intel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Intel": {
+      "main": [
+        [
+          {
+            "node": "🖥️ Push Competitors to Dashboard",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🖥️ Push Competitors to Dashboard": {
+      "main": [
+        [
+          {
+            "node": "Build Competitor Digest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Competitor Digest": {
+      "main": [
+        [
+          {
+            "node": "📲 Telegram: Competitor Digest",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🚨 Changes Detected?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🚨 Changes Detected?": {
+      "main": [
+        [
+          {
+            "node": "📧 Gmail: Competitor Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎣 Telegram: Approval Button": {
+      "main": [
+        [
+          {
+            "node": "⚙️ CONFIG (Approvals)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⚙️ CONFIG (Approvals)": {
+      "main": [
+        [
+          {
+            "node": "Parse Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Decision": {
+      "main": [
+        [
+          {
+            "node": "💬 Telegram: Ack Button",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💬 Telegram: Ack Button": {
+      "main": [
+        [
+          {
+            "node": "🖥️ Record Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🖥️ Record Decision": {
+      "main": [
+        [
+          {
+            "node": "Build Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Result": {
+      "main": [
+        [
+          {
+            "node": "📲 Telegram: Decision Result",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "👍 Approved & New?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "👍 Approved & New?": {
+      "main": [
+        [
+          {
+            "node": "📧 Gmail: Approved Post Ready",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {}
+}

@@ -150,7 +150,7 @@
               "id": "91c0cf4c-0df8-4ddc-b9f1-fa483ad844b2",
               "name": "geminiModel",
               "type": "string",
-              "value": "gemini-2.5-flash"
+              "value": "gemini-2.5-flash-lite"
             },
             {
               "id": "cfg-CONFIG-0",
@@ -297,7 +297,10 @@
         780,
         -140
       ],
-      "notes": "Free tier: 1,500 requests/day on gemini-2.5-flash"
+      "notes": "Free tier: 1,500 requests/day on gemini-2.5-flash",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -367,7 +370,10 @@
       "position": [
         1260,
         -140
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -490,7 +496,9 @@
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG').first().json.telegramChatId }}",
         "text": "=☀️ {{ $('⚙️ CONFIG').first().json.brandName }} Daily Brief — {{ $json.date }}\n\nSentiment: {{ $json.sentiment }}\n{{ $json.market_summary }}\n\n📰 Headlines processed: {{ $json.headline_count }}\n✍️ Blog idea: {{ $json.blog_idea }}",
-        "additionalFields": {}
+        "additionalFields": {
+          "appendAttribution": false
+        }
       },
       "id": "aee9da45-5165-47b1-8427-92c8cdf1c1d8",
       "name": "📲 Telegram: Brief Alert",
@@ -644,7 +652,10 @@
       "position": [
         300,
         280
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -775,7 +786,9 @@
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG (Leads)').first().json.telegramChatId }}",
         "text": "=🔥 HOT LEAD — score {{ $json.score }}/10\n\n👤 {{ $json.name }} ({{ $json.country }})\n📧 {{ $json.email }}\n🎯 Persona: {{ $json.persona }}\n💡 Recommended: {{ $json.recommended_challenge }}\n📝 {{ $json.reasoning }}",
-        "additionalFields": {}
+        "additionalFields": {
+          "appendAttribution": false
+        }
       },
       "id": "0cdc9369-0ba1-4a6e-96bb-fbb78ea60118",
       "name": "📲 Telegram: HOT LEAD",
@@ -884,7 +897,7 @@
               "id": "4bbc64c0-6b71-4393-bd76-7d1114ec7e3f",
               "name": "geminiModel",
               "type": "string",
-              "value": "gemini-2.5-flash"
+              "value": "gemini-2.5-flash-lite"
             },
             {
               "id": "cfg-FIGLeads-0",
@@ -903,6 +916,12 @@
               "name": "trustpilotDomain",
               "type": "string",
               "value": "ftmo.com"
+            },
+            {
+              "id": "cfg-hubspot-0",
+              "name": "hubspotToken",
+              "type": "string",
+              "value": ""
             }
           ]
         },
@@ -977,7 +996,7 @@
               "id": "fb919ac4-296d-40aa-9d64-29286113b4dc",
               "name": "geminiModel",
               "type": "string",
-              "value": "gemini-2.5-flash"
+              "value": "gemini-2.5-flash-lite"
             },
             {
               "id": "cfg-GMonitor-0",
@@ -1182,6 +1201,7 @@
         "chatId": "={{ $('⚙️ CONFIG (Monitor)').first().json.telegramChatId }}",
         "text": "=🚨 *Monitored site appears DOWN* ({{ $('⚙️ CONFIG (Monitor)').first().json.targetUrl }})\nStatus: {{ $json.status_code }}\nTime: {{ $json.checked_at }}\nCheck it immediately — a promo could be live.",
         "additionalFields": {
+          "appendAttribution": false,
           "parse_mode": "Markdown"
         }
       },
@@ -1341,7 +1361,7 @@
               "id": "4b991368-fa1b-4695-a835-1cb5b96b9746",
               "name": "geminiModel",
               "type": "string",
-              "value": "gemini-2.5-flash"
+              "value": "gemini-2.5-flash-lite"
             },
             {
               "id": "cfg-IGErrors-0",
@@ -1395,7 +1415,9 @@
         "operation": "sendMessage",
         "chatId": "={{ $('⚙️ CONFIG (Errors)').first().json.telegramChatId }}",
         "text": "=❗ Workflow error\nWorkflow: {{ $json.wf }}\nNode: {{ $json.node }}\nError: {{ $json.msg }}\n{{ $json.url }}",
-        "additionalFields": {}
+        "additionalFields": {
+          "appendAttribution": false
+        }
       },
       "id": "980b4f07-4797-4457-abfe-94acdc525b5a",
       "name": "📲 Telegram: Workflow Error",
@@ -1435,6 +1457,167 @@
           "id": "",
           "name": "Gmail account (connect yours)"
         }
+      }
+    },
+    {
+      "id": "73287c71-c2ba-46dc-a093-148a503da1f8",
+      "name": "📤 Build Approval Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1504,
+        340
+      ],
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "// One Telegram approval request per queued post (ids come from the dashboard response)\nconst res = $input.first().json || {};\nconst posts = Array.isArray(res.posts) ? res.posts : [];\nconst label = { x: 'X / Twitter', linkedin: 'LinkedIn', discord: 'Discord' };\nreturn posts.map(p => ({ json: {\n  id: p.id,\n  platform: p.platform,\n  text: ('📝 Post awaiting approval — ' + (label[p.platform] || p.platform) + ' (#' + p.id + ')\\n\\n' + p.content).slice(0, 3900)\n} }));"
+      }
+    },
+    {
+      "id": "4a6abf9c-6f81-46b7-a467-96504993df6a",
+      "name": "✅ Telegram: Approval Request",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1744,
+        340
+      ],
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "={{ $('⚙️ CONFIG').first().json.telegramChatId }}",
+        "text": "={{ $json.text }}",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "✅ Approve",
+                    "additionalFields": {
+                      "callback_data": "=approve:{{ $json.id }}"
+                    }
+                  },
+                  {
+                    "text": "❌ Reject",
+                    "additionalFields": {
+                      "callback_data": "=reject:{{ $json.id }}"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "telegramApi": {
+          "id": "",
+          "name": "Telegram account (connect yours)"
+        }
+      }
+    },
+    {
+      "id": "ad88e3b5-6697-4c58-a633-ab3b4db9d550",
+      "name": "🧾 HubSpot Configured?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        640
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "hs-token-set",
+              "leftValue": "={{ $('⚙️ CONFIG (Leads)').first().json.hubspotToken }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "0c8d8aca-e43f-4e7d-bb6d-b1e22f655c8c",
+      "name": "🧾 HubSpot: Upsert Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1264,
+        700
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts/batch/upsert",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $('⚙️ CONFIG (Leads)').first().json.hubspotToken }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ inputs: [{ idProperty: \"email\", id: $('🧩 Parse Lead Score').first().json.email, properties: { email: $('🧩 Parse Lead Score').first().json.email, firstname: ($('🧩 Parse Lead Score').first().json.name || '').split(' ')[0], lastname: ($('🧩 Parse Lead Score').first().json.name || '').split(' ').slice(1).join(' '), country: $('🧩 Parse Lead Score').first().json.country, lifecyclestage: \"lead\", hs_lead_status: $('🧩 Parse Lead Score').first().json.score >= 7 ? \"OPEN\" : \"NEW\" } }] }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "52818242-444b-4f6e-9721-98a110c678ed",
+      "name": "🧾 Mark CRM Synced",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1504,
+        700
+      ],
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('⚙️ CONFIG (Leads)').first().json.dashboardWebhookUrl }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ type: \"crm_synced\", lead_id: $('🖥️ Push Lead to Dashboard').first().json.leadId, crm_id: ($json.results && $json.results[0] && $json.results[0].id) || \"\" }) }}",
+        "options": {
+          "timeout": 20000
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "id": "6ab0ff6c-1c98-43d5-a915-df343630a3cc",
+      "name": "⏳ Space Gemini Calls",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1264,
+        -20
+      ],
+      "parameters": {
+        "resume": "timeInterval",
+        "amount": 12,
+        "unit": "seconds"
       }
     }
   ],
@@ -1573,11 +1756,6 @@
             "index": 0
           },
           {
-            "node": "🤖 Gemini: Blog Outline",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "📧 Gmail: Send Daily Brief",
             "type": "main",
             "index": 0
@@ -1589,6 +1767,11 @@
           },
           {
             "node": "🖥️ Push to Mission Control",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "⏳ Space Gemini Calls",
             "type": "main",
             "index": 0
           }
@@ -1857,6 +2040,72 @@
         [
           {
             "node": "🌐 Check target site",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🖥️ Push to Mission Control": {
+      "main": [
+        [
+          {
+            "node": "📤 Build Approval Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📤 Build Approval Items": {
+      "main": [
+        [
+          {
+            "node": "✅ Telegram: Approval Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🖥️ Push Lead to Dashboard": {
+      "main": [
+        [
+          {
+            "node": "🧾 HubSpot Configured?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧾 HubSpot Configured?": {
+      "main": [
+        [
+          {
+            "node": "🧾 HubSpot: Upsert Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧾 HubSpot: Upsert Contact": {
+      "main": [
+        [
+          {
+            "node": "🧾 Mark CRM Synced",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "⏳ Space Gemini Calls": {
+      "main": [
+        [
+          {
+            "node": "🤖 Gemini: Blog Outline",
             "type": "main",
             "index": 0
           }
