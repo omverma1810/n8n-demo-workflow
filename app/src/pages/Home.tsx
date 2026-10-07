@@ -16,6 +16,14 @@ import {
   Newspaper,
   MessageSquare,
   Send,
+  CircleCheck,
+  Clock,
+  Radar,
+  Link2,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  ListChecks,
 } from "lucide-react";
 
 const REFRESH = 10000;
@@ -51,6 +59,21 @@ function CopyBtn({ id, text }: { id: string; text: string }) {
   );
 }
 
+const LEAD_STATUSES = ["new", "contacted", "qualified", "won", "lost"] as const;
+const statusStyle: Record<string, string> = {
+  new: "border-zinc-600 text-zinc-300",
+  contacted: "border-sky-500/50 text-sky-300",
+  qualified: "border-amber-500/50 text-amber-300",
+  won: "border-emerald-500/50 text-emerald-300",
+  lost: "border-rose-500/50 text-rose-300",
+};
+const postStatusStyle: Record<string, string> = {
+  pending: "border-amber-500/40 bg-amber-500/10 text-amber-300",
+  approved: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
+  rejected: "border-rose-500/40 bg-rose-500/10 text-rose-300",
+};
+const platformLabel: Record<string, string> = { x: "X / Twitter", linkedin: "LinkedIn", discord: "Discord" };
+
 const sentimentStyle: Record<string, string> = {
   "risk-on": "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
   "risk-off": "bg-rose-500/15 text-rose-300 border-rose-500/40",
@@ -62,6 +85,14 @@ export default function Home() {
   const briefs = trpc.dashboard.briefs.useQuery(undefined, { refetchInterval: REFRESH });
   const leads = trpc.dashboard.leads.useQuery(undefined, { refetchInterval: REFRESH });
   const health = trpc.dashboard.health.useQuery(undefined, { refetchInterval: REFRESH });
+  const posts = trpc.dashboard.posts.useQuery(undefined, { refetchInterval: REFRESH });
+  const competitors = trpc.dashboard.competitors.useQuery(undefined, { refetchInterval: REFRESH });
+  const utils = trpc.useUtils();
+  const setStatus = trpc.dashboard.setLeadStatus.useMutation({
+    onSuccess: () => {
+      utils.dashboard.leads.invalidate();
+    },
+  });
 
   const s = stats.data;
   const brief = briefs.data?.[0];
@@ -147,6 +178,21 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <c.icon size={18} className={c.tint} />
               </div>
+              <p className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{c.value}</p>
+              <p className="mt-1 text-[11px] text-zinc-400 sm:text-xs">{c.label}</p>
+            </Card>
+          ))}
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+          {[
+            { icon: Clock, label: "Posts Awaiting Approval", value: s?.pendingPosts ?? "—", tint: "text-amber-300" },
+            { icon: CircleCheck, label: "Posts Approved", value: s?.approvedPosts ?? "—", tint: "text-emerald-300" },
+            { icon: Radar, label: "Competitors Watched", value: s?.competitorsTracked ?? "—", tint: "text-fuchsia-300" },
+            { icon: Link2, label: "Leads Synced to CRM", value: s?.crmSynced ?? "—", tint: "text-sky-300" },
+          ].map((c) => (
+            <Card key={c.label} className="p-4">
+              <c.icon size={18} className={c.tint} />
               <p className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">{c.value}</p>
               <p className="mt-1 text-[11px] text-zinc-400 sm:text-xs">{c.label}</p>
             </Card>
@@ -254,6 +300,100 @@ export default function Home() {
               </Card>
             )}
 
+            {/* Approval queue */}
+            <Card className="p-5 sm:p-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <ListChecks size={18} className="text-yellow-400" />
+                <h2 className="font-semibold">Approval Queue</h2>
+                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">
+                  approve on Telegram before anything is published
+                </span>
+              </div>
+              <div className="mt-4 space-y-3">
+                {(posts.data ?? []).map((p) => (
+                  <div key={p.id} className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-3.5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+                        {platformLabel[p.platform] ?? p.platform} · #{p.id}
+                      </span>
+                      <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${postStatusStyle[p.status] ?? ""}`}>
+                        {p.status}
+                        {p.decidedBy ? ` · ${p.decidedBy}` : ""}
+                      </span>
+                    </div>
+                    <p className="mt-2 line-clamp-3 whitespace-pre-wrap text-sm text-zinc-300">{p.content}</p>
+                  </div>
+                ))}
+                {posts.data?.length === 0 && (
+                  <p className="py-4 text-center text-sm text-zinc-500">No drafts yet — run Pipeline A.</p>
+                )}
+              </div>
+            </Card>
+
+            {/* Competitor watch */}
+            <Card className="p-5 sm:p-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <Radar size={18} className="text-yellow-400" />
+                <h2 className="font-semibold">Competitor Watch</h2>
+                <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[11px] text-zinc-400">
+                  daily · rating + live offer tracking
+                </span>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="w-full min-w-[560px] text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
+                      <th className="pb-2 pr-3 font-medium">Competitor</th>
+                      <th className="pb-2 pr-3 font-medium">Rating</th>
+                      <th className="pb-2 pr-3 font-medium">Current offer / positioning</th>
+                      <th className="pb-2 font-medium">Seen</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(competitors.data ?? []).map((c) => {
+                      const d = c.trustpilotRating && c.prevRating ? Math.round((parseFloat(c.trustpilotRating) - parseFloat(c.prevRating)) * 10) / 10 : 0;
+                      return (
+                        <tr key={c.domain} className="border-b border-zinc-800/60 align-top last:border-0">
+                          <td className="py-3 pr-3">
+                            <p className="font-medium text-zinc-200">{c.domain}</p>
+                            <p className="text-xs text-zinc-500">{c.siteUp ? "site up" : "site DOWN"}</p>
+                          </td>
+                          <td className="py-3 pr-3">
+                            <span className="inline-flex items-center gap-1 font-semibold text-zinc-200">
+                              <Star size={12} className="fill-yellow-400 text-yellow-400" />
+                              {c.trustpilotRating ?? "—"}
+                              {d > 0 && <ArrowUp size={13} className="text-emerald-400" />}
+                              {d < 0 && <ArrowDown size={13} className="text-rose-400" />}
+                              {d === 0 && c.prevRating && <Minus size={13} className="text-zinc-500" />}
+                            </span>
+                          </td>
+                          <td className="py-3 pr-3 text-zinc-300">
+                            {c.promoDetected && (
+                              <span className="mr-2 rounded-full border border-fuchsia-500/40 bg-fuchsia-500/10 px-2 py-0.5 text-[11px] text-fuchsia-300">
+                                promo
+                              </span>
+                            )}
+                            {c.changed && (
+                              <span className="mr-2 rounded-full border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-300">
+                                changed
+                              </span>
+                            )}
+                            {c.offerSummary}
+                          </td>
+                          <td className="py-3 text-xs text-zinc-500">
+                            {c.checkedAt ? new Date(c.checkedAt).toLocaleDateString() : "—"}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+                {competitors.data?.length === 0 && (
+                  <p className="py-6 text-center text-sm text-zinc-500">No competitor data yet — run the competitor watch.</p>
+                )}
+              </div>
+            </Card>
+
             {/* Leads */}
             <Card className="p-5 sm:p-6">
               <div className="flex items-center gap-2">
@@ -264,13 +404,14 @@ export default function Home() {
                 </span>
               </div>
               <div className="mt-4 overflow-x-auto">
-                <table className="w-full min-w-[560px] text-left text-sm">
+                <table className="w-full min-w-[680px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
                       <th className="pb-2 pr-3 font-medium">Lead</th>
                       <th className="pb-2 pr-3 font-medium">Persona</th>
                       <th className="pb-2 pr-3 font-medium">Score</th>
                       <th className="pb-2 pr-3 font-medium">Recommended</th>
+                      <th className="pb-2 pr-3 font-medium">CRM status</th>
                       <th className="pb-2 font-medium">Received</th>
                     </tr>
                   </thead>
@@ -299,6 +440,26 @@ export default function Home() {
                           </span>
                         </td>
                         <td className="py-3 pr-3 text-zinc-300">{l.recommendedChallenge}</td>
+                        <td className="py-3 pr-3">
+                          <select
+                            value={l.status}
+                            onChange={(e) =>
+                              setStatus.mutate({ id: l.id, status: e.target.value as (typeof LEAD_STATUSES)[number] })
+                            }
+                            className={`min-h-[36px] rounded-lg border bg-zinc-950 px-2 text-xs font-medium capitalize ${statusStyle[l.status] ?? ""}`}
+                          >
+                            {LEAD_STATUSES.map((st) => (
+                              <option key={st} value={st}>
+                                {st}
+                              </option>
+                            ))}
+                          </select>
+                          {l.crmId && (
+                            <p className="mt-1 flex items-center gap-1 text-[10px] text-sky-400">
+                              <Link2 size={10} /> CRM #{l.crmId}
+                            </p>
+                          )}
+                        </td>
                         <td className="py-3 text-xs text-zinc-500">
                           {l.createdAt ? new Date(l.createdAt).toLocaleString() : "—"}
                         </td>
@@ -360,6 +521,9 @@ export default function Home() {
                   ["B", "Lead Intake & AI Scoring", "Webhook · validate → Gemini score → route"],
                   ["C", "Site & Reputation Monitor", "Hourly · uptime + Trustpilot → alerts"],
                   ["D", "Global Error Handler", "Any failure → Telegram + email"],
+                  ["E", "Competitor Watch", "Daily · ratings + offers → change alerts"],
+                  ["F", "Approval Before Publish", "Telegram buttons → approved copy emailed"],
+                  ["G", "CRM Sync", "Scored lead → pipeline status + HubSpot"],
                 ].map(([k, t, d]) => (
                   <li key={k} className="flex items-start gap-3">
                     <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-yellow-400/15 text-xs font-bold text-yellow-300">
@@ -375,7 +539,7 @@ export default function Home() {
             </Card>
 
             <p className="px-1 text-center text-xs text-zinc-600">
-              SignalForge AI Growth Ops Engine — 4 autonomous pipelines, $0/month stack
+              SignalForge AI Growth Ops Engine — 7 autonomous pipelines, $0/month stack
             </p>
           </div>
         </div>

@@ -34,61 +34,11 @@ app.post("/api/webhook/n8n", async (c) => {
     return c.json({ ok: false, error: "invalid JSON body" }, 400);
   }
 
-  const { getDb } = await import("./queries/connection");
-  const schema = await import("@db/schema");
-  const db = getDb();
-
   try {
-    switch (body.type) {
-      case "daily_brief":
-        await db.insert(schema.briefs).values({
-          date: String(body.date ?? new Date().toISOString().slice(0, 10)),
-          marketSummary: String(body.market_summary ?? ""),
-          sentiment: String(body.sentiment ?? "mixed"),
-          sentimentReason: String(body.sentiment_reason ?? ""),
-          contentAngles: Array.isArray(body.content_angles)
-            ? (body.content_angles as string[])
-            : [],
-          postX: String(body.post_x ?? ""),
-          postLinkedin: String(body.post_linkedin ?? ""),
-          postDiscord: String(body.post_discord ?? ""),
-          blogIdea: String(body.blog_idea ?? ""),
-          seoKeywords: Array.isArray(body.seo_keywords)
-            ? (body.seo_keywords as string[])
-            : [],
-        });
-        return c.json({ ok: true, stored: "daily_brief" });
-
-      case "lead":
-        await db.insert(schema.leads).values({
-          name: String(body.name ?? ""),
-          email: String(body.email ?? ""),
-          country: String(body.country ?? ""),
-          experience: String(body.experience ?? ""),
-          capital: String(body.capital ?? ""),
-          score: Number(body.score) || 0,
-          persona: String(body.persona ?? ""),
-          recommendedChallenge: String(body.recommended_challenge ?? ""),
-          reasoning: String(body.reasoning ?? ""),
-        });
-        return c.json({ ok: true, stored: "lead" });
-
-      case "health":
-        await db.insert(schema.healthChecks).values({
-          siteUp: Boolean(body.site_up),
-          statusCode: Number(body.status_code) || 0,
-          trustpilotRating:
-            body.trustpilot_rating != null ? String(body.trustpilot_rating) : null,
-          checkedAt: body.checked_at ? new Date(String(body.checked_at)) : new Date(),
-        });
-        return c.json({ ok: true, stored: "health" });
-
-      default:
-        return c.json(
-          { ok: false, error: "unknown type — use daily_brief | lead | health" },
-          400,
-        );
-    }
+    const { handleWebhook } = await import("./webhook");
+    const result = await handleWebhook(body);
+    const status = (result as { status?: number }).status ?? 200;
+    return c.json(result, status as 200 | 400);
   } catch (err) {
     console.error("webhook ingest failed:", err);
     return c.json({ ok: false, error: "ingest failed" }, 500);

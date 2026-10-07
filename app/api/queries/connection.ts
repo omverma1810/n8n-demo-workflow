@@ -6,7 +6,8 @@ import * as relations from "@db/relations";
 
 const fullSchema = { ...schema, ...relations };
 
-let instance: ReturnType<typeof drizzle<typeof fullSchema>>;
+import type { MySql2Database } from "drizzle-orm/mysql2";
+let instance: MySql2Database<typeof fullSchema>;
 
 // Managed MySQL providers (Aiven, PlanetScale, ...) require TLS. mysql2 does not
 // understand `?ssl-mode=REQUIRED`, so parse the URL and enable TLS explicitly.
@@ -29,7 +30,8 @@ function createPool() {
 
 export function getDb() {
   if (!instance) {
-    instance = drizzle(createPool(), {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    instance = drizzle(createPool() as any, {
       mode: "default",
       schema: fullSchema,
     });
